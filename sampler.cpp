@@ -56,7 +56,7 @@ void Sampler::printOutputToTerminal() {
         cout << " Parameter " << i+1 << " : " << pa.at(i) << endl;
     }
     cout << endl;
-    cout << "  -- Reults -- " << endl;
+    cout << "  -- Results -- " << endl;
     cout << " Energy : " << m_energy << endl;
     cout << endl;
 }
@@ -64,6 +64,7 @@ void Sampler::printOutputToTerminal() {
 void Sampler::computeAverages() {
     /* Compute the averages of the sampled quantities. You need to think
      * thoroughly through what is written here currently; is this correct?
+     * Take away the non-physical stuff before eqilibrium - so not all steps
      */
     m_energy = m_cumulativeEnergy / m_system->getNumberOfMetropolisSteps();
 }

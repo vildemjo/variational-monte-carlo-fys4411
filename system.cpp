@@ -14,6 +14,17 @@ bool System::metropolisStep() {
      * at this new position with the one at the old position).
      */
 
+    /* if random() <= wfnew**2 / wfold**2:
+                PositionOld = PositionNew
+                wfold = wfnew */
+
+
+    alpha = alpha + 0.05;
+    // Choosing a random particle that is Psi_(T-alpha)
+    double positionOld = m_stepLength * (random() - 0.5); // QUESTION: How does this work?
+    double waveFunctionOld = m_waveFunction(positionOld, alpha)
+    
+
     return false;
 }
 
@@ -24,7 +35,7 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
 
     for (int i=0; i < numberOfMetropolisSteps; i++) {
-        bool acceptedStep = metropolisStep();
+        bool acceptedStep = metropolisStep(); // Question will this run only if it is == 1
 
         /* Here you should sample the energy (and maybe other things using
          * the m_sampler instance of the Sampler class. Make sure, though,
