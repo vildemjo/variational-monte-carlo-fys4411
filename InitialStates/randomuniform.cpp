@@ -42,7 +42,8 @@ void RandomUniform::setupInitialState() {
              * according to their index in the particles list (this is
              * obviously NOT a good idea).
              */
-            position.push_back(i);
+
+            position.push_back(system.getStepLength()*(random.nextDouble()-0.5));
         }
         m_particles.push_back(new Particle());
         m_particles.at(i)->setNumberOfDimensions(m_numberOfDimensions);
