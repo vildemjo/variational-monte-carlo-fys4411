@@ -19,6 +19,7 @@ public:
     int getNumberOfParticles()          { return m_numberOfParticles; }
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
+    double getStepLength()              { return m_stepLength; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
 
 private:

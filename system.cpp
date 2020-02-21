@@ -13,18 +13,33 @@ bool System::metropolisStep() {
      * accepted by the Metropolis test (compare the wave function evaluated
      * at this new position with the one at the old position).
      */
-
-    /* if random() <= wfnew**2 / wfold**2:
-                PositionOld = PositionNew
-                wfold = wfnew */
-
-
-    alpha = alpha + 0.05;
-    // Choosing a random particle that is Psi_(T-alpha)
-    double positionOld = m_stepLength * (random() - 0.5); // QUESTION: How does this work?
-    double waveFunctionOld = m_waveFunction(positionOld, alpha)
     
+    // Calculate old wavefunction
+    double oldWaveFunction = m_waveFunction->evaluate(m_particles);
 
+    // Choose random particle
+    int randomParticleIndex = Random::nextInt(m_numberOfParticles-1);
+
+    std::vector<double> randomAmount = std::vector<double>();
+
+    // Change particle's position in all dimentions
+    for(int m1=0;m1<m_numberOfDimensions; m1++){
+        randomAmount.push_back(m_stepLength*(Random::nextDouble()-0.5));
+        m_particles[randomParticleIndex]->adjustPosition(randomAmount[m1], m1);
+    }
+
+    // Calculate new wavefunction
+    double newWaveFunction = m_waveFunction->evaluate(m_particles);
+
+    // Compare new wavefunction with old wavefunction
+    if (Random::nextDouble() <= newWaveFunction*newWaveFunction/(oldWaveFunction*oldWaveFunction)){
+        return true;
+        }
+
+    // Move the particle back if not accepted
+    for(int m2=0;m2<m_numberOfDimensions; m2++){
+        m_particles[randomParticleIndex]->adjustPosition(-randomAmount[m2], m2);
+    }
     return false;
 }
 
@@ -35,7 +50,10 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
 
     for (int i=0; i < numberOfMetropolisSteps; i++) {
-        bool acceptedStep = metropolisStep(); // Question will this run only if it is == 1
+        
+        bool acceptedStep = metropolisStep();
+
+        // Calculate energy (with choise of num or analytical?)
 
         /* Here you should sample the energy (and maybe other things using
          * the m_sampler instance of the Sampler class. Make sure, though,
