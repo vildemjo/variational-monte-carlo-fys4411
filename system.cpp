@@ -97,4 +97,7 @@ void System::setInitialState(InitialState* initialState) {
     m_initialState = initialState;
 }
 
+void System::setAnalytical(bool statement){
+    m_analytical = statement;
+}
 

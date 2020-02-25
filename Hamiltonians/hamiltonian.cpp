@@ -1,55 +1,53 @@
 #include "hamiltonian.h"
+#include "../particle.h"
 #include "../system.h"
+#include "../WaveFunctions/wavefunction.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 Hamiltonian::Hamiltonian(System* system) {
     m_system = system;
 }
 
-/*
 double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particle*> particles) {
-    std::vector<Particle*> particles_more = particles;
-    std::vector<Particle*> particles_less = particles;
-    std::vector<Particle*> particles_org = particles;
-    
-    double step = 0.001;
+
+    double step = 1e-3;
     double dpsidr2 = 0.0;
     double rSum2 = 0.0;
 
-    int numberOfParticles = particles.size();
-    int numberOfDimensions = particles[0]->getPosition().size();
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
 
-    std::vector<double> r(numberOfDimensions);
-
-    // Finding the sum for r - original
-    for(int i3=0; i3<numberOfParticles; i3++){
-        r = particles[i3]->getPosition();
-        for(int n3=0; n3<numberOfDimensions;n3++){
-            rSum2 += r[n3]*r[n3];
-        }
-    }
+    double waveNext = 0;
+    double waveLast = 0;
+    double waveCurrent = 0;
 
     // Changing the copies to obtain an array of "next step" and "previous step"
     for(int i4=0; i4<numberOfParticles; i4++){
          for(int n4=0; n4<numberOfDimensions;n4++){
-            // finding the next step and previous step for one particle in one spesific dimension
-            particles_less[i4]->adjustPosition(step, n4);
-            particles_more[i4]->adjustPosition(step, n4);
+            // next step
+            particles[i4]->adjustPosition(step, n4);
+            waveNext = m_system->getWaveFunction()->evaluate(particles);
 
-            dpsidr2 += (m_system->getWaveFunction()->evaluate(particles_more)+m_system->getWaveFunction()->evaluate(particles_less))/(step*step);
+            // previous step
+            particles[i4]->adjustPosition(-2*step, n4);
+            waveLast = m_system->getWaveFunction()->evaluate(particles);
 
-            // Resetting the arrays so that a new particle and spesific dimension can be calculated
-            particles_less[i4]->adjustPosition(-step, n4);
-            particles_more[i4]->adjustPosition(-step, n4);
+            // Calculating the part of the double derivative which involves psi(x+dx) and psi(x-dx)
+            dpsidr2 += (waveNext+waveLast)/(step*step);
+
+            // Resetting the particlepositions so that a new particle and spesific dimension can be calculated
+            particles[i4]->adjustPosition(step, n4); 
         }
     }
-    
 
+    waveCurrent = m_system->getWaveFunction()->evaluate(particles);
 
-    dpsidr2 += -2*numberOfParticles*numberOfDimensions*m_system->getWaveFunction()->evaluate(particles_more)/(step*step);
+    // Calculating the part of the double derivative which involves psi(x)
+    dpsidr2 += numberOfParticles*numberOfDimensions*(-2*waveCurrent/(step*step));
 
-return dpsidr2
-
-
-    
-    
-}*/
+    return dpsidr2;
+ 
+}

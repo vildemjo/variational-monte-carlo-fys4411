@@ -13,8 +13,8 @@ using namespace std;
 
 
 int main() {
-    int numberOfDimensions  = 2;
-    int numberOfParticles   = 2;
+    int numberOfDimensions  = 1;
+    int numberOfParticles   = 1;
     int numberOfSteps       = (int) 1e6;
     double omega            = 1.0;          // Oscillator frequency.
     double alpha            = 0.5;          // Variational parameter.
@@ -28,6 +28,7 @@ int main() {
     system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
     system->setEquilibrationFraction    (equilibration);
     system->setStepLength               (stepLength);
+    system->setAnalytical               (true);
     system->runMetropolisSteps          (numberOfSteps);
     return 0;
 }

@@ -12,6 +12,7 @@ public:
     void setHamiltonian             (class Hamiltonian* hamiltonian);
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
+    void setAnalytical              (bool statement);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }
@@ -19,6 +20,7 @@ public:
     int getNumberOfParticles()          { return m_numberOfParticles; }
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
+    bool getAnalytical()                { return m_analytical; }
     double getStepLength()              { return m_stepLength; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
 
@@ -26,6 +28,7 @@ private:
     int                             m_numberOfParticles = 0;
     int                             m_numberOfDimensions = 0;
     int                             m_numberOfMetropolisSteps = 0;
+    bool                            m_analytical = false;
     double                          m_equilibrationFraction = 0.0;
     double                          m_stepLength = 0.1;
     class WaveFunction*             m_waveFunction = nullptr;

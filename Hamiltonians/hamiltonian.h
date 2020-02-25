@@ -4,7 +4,7 @@
 class Hamiltonian {
 public:
     Hamiltonian(class System* system);
-    // double computeDoubleDerivativeNumerically(std::vector<class Particle*> particles);
+    double computeDoubleDerivativeNumerically(std::vector<class Particle*> particles);
     virtual double computeLocalEnergy(std::vector<class Particle*> particles) = 0;
 
 protected:
