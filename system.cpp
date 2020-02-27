@@ -77,13 +77,13 @@ bool System::metropolisStep() {
         if (Random::nextDouble() <= greensFunctionFrac*newWaveFunction*newWaveFunction/(oldWaveFunction*oldWaveFunction)){
             return true;
             }
-    // Move back if it is not accepted
-    for(int m4=0;m4<m_numberOfDimensions; m4++){
-        m_particles[particleIndex]->adjustPosition(-importanceAmount[m4], m4);
-    }
+        // Move back if it is not accepted
+        for(int m4=0;m4<m_numberOfDimensions; m4++){
+            m_particles[particleIndex]->adjustPosition(-importanceAmount[m4], m4);
+        }
     
     return false;
-
+    
     }
     
 }

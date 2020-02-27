@@ -25,16 +25,19 @@ void Sampler::sample(bool acceptedStep) {
     if (m_stepNumber == 0) {
         m_cumulativeEnergy = 0;
     }
+    if (acceptedStep == 1) { m_numberOfAcceptedSteps += 1; }
 
     /* Here you should sample all the interesting things you want to measure.
      * Note that there are (way) more than the single one here currently.
      */
+    // Sampling if the equilibrium stage is passed
+    if (m_stepNumber > m_system->getEquilibrationFraction()*m_system->getNumberOfMetropolisSteps()){
+        double localEnergy = m_system->getHamiltonian()->
+                            computeLocalEnergy(m_system->getParticles());
+        m_cumulativeEnergy  += localEnergy;
 
-    double localEnergy = m_system->getHamiltonian()->
-                         computeLocalEnergy(m_system->getParticles());
-    m_cumulativeEnergy  += localEnergy;
-
-    m_cumulativeEnergySquared += localEnergy*localEnergy;
+        m_cumulativeEnergySquared += localEnergy*localEnergy;
+    }
 
     m_stepNumber++;
 }
@@ -45,6 +48,7 @@ void Sampler::printOutputToTerminal() {
     int     ms = m_system->getNumberOfMetropolisSteps();
     int     p  = m_system->getWaveFunction()->getNumberOfParameters();
     double  ef = m_system->getEquilibrationFraction();
+    double  ac = 100*m_numberOfAcceptedSteps/ms;
     std::vector<double> pa = m_system->getWaveFunction()->getParameters();
 
     cout << endl;
@@ -53,6 +57,7 @@ void Sampler::printOutputToTerminal() {
     cout << " Number of dimensions : " << nd << endl;
     cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
     cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
+    cout << " Accepted steps: " << ac << " %" << endl;
     cout << endl;
     cout << "  -- Wave function parameters -- " << endl;
     cout << " Number of parameters : " << p << endl;
@@ -71,6 +76,8 @@ void Sampler::computeAverages() {
      * thoroughly through what is written here currently; is this correct?
      * Take away the non-physical stuff before eqilibrium - so not all steps
      */
-    m_energy = m_cumulativeEnergy / m_system->getNumberOfMetropolisSteps();
-    m_energySquared = m_cumulativeEnergySquared / m_system->getNumberOfMetropolisSteps();
+    m_energy = m_cumulativeEnergy / (m_system->getNumberOfMetropolisSteps()*
+                                    (1-m_system->getEquilibrationFraction()));
+    m_energySquared = m_cumulativeEnergySquared / (m_system->getNumberOfMetropolisSteps()*
+                                                    (1-m_system->getEquilibrationFraction()));
 }

@@ -43,6 +43,8 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     double doubleDerivative;
 
     double potentialEnergy = 0.5*m*omega*rSum2;
+
+    // Calculating the normalized second derivative either analytically or numerically
     if (m_system->getAnalytical() == true){
         doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
         }

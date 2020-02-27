@@ -16,5 +16,6 @@ private:
     double  m_energySquared = 0;
     double  m_cumulativeEnergy = 0;
     double  m_cumulativeEnergySquared = 0;
+    int     m_numberOfAcceptedSteps = 0;
     class System* m_system = nullptr;
 };

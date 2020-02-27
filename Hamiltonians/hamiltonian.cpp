@@ -27,11 +27,11 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
     // Changing the copies to obtain an array of "next step" and "previous step"
     for(int i4=0; i4<numberOfParticles; i4++){
          for(int n4=0; n4<numberOfDimensions;n4++){
-            // next step
+            // Wave function at forward step
             particles[i4]->adjustPosition(step, n4);
             waveNext = m_system->getWaveFunction()->evaluate(particles);
 
-            // previous step
+            // Wave function at backward step
             particles[i4]->adjustPosition(-2*step, n4);
             waveLast = m_system->getWaveFunction()->evaluate(particles);
 
@@ -46,8 +46,8 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
     waveCurrent = m_system->getWaveFunction()->evaluate(particles);
 
     // Calculating the part of the double derivative which involves psi(x)
-    dpsidr2 += numberOfParticles*numberOfDimensions*(-2*waveCurrent/(step*step));
+    dpsidr2 += -2*numberOfParticles*numberOfDimensions*waveCurrent/(step*step);
 
-    return dpsidr2;
+    return (1/waveCurrent)*dpsidr2;
  
 }
