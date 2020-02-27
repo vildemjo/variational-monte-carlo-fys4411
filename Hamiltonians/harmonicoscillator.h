@@ -7,6 +7,7 @@ public:
     HarmonicOscillator(System* system, double omega);
     double computeLocalEnergy(std::vector<Particle*> particles);
     std::vector<double> computeQuantumForce(std::vector<class Particle*> particles);
+    double computeEnergyDerivative(std::vector<class Particle*> particles);
 
 private:
     double m_omega = 0;

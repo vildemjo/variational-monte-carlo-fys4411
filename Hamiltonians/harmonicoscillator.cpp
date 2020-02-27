@@ -68,3 +68,22 @@ std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Pa
     return derivative;
 }
 
+double HarmonicOscillator::computeEnergyDerivative(std::vector<class Particle*> particles){
+    double hbar = 1.0;
+    double m = 1.0;
+    
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimentions = m_system->getNumberOfDimensions();
+    double alpha = m_system->getWaveFunction()->getParameters()[0];
+    double rSum;
+
+    for (int i9 = 0; i9<numberOfParticles;i9++){
+        auto r = particles[i9]->getPosition();
+        for (int n9=0; n9<numberOfDimentions; n9++){
+            rSum += r[n9];
+        }
+    }
+
+    return (-hbar*hbar/2*m)*(-2*numberOfDimentions*numberOfParticles + 8*alpha*rSum);
+}
+

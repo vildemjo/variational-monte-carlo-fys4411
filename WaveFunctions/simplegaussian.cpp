@@ -77,3 +77,5 @@ std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle
 
     return vectorSum;
 }
+
+
