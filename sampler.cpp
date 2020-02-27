@@ -29,10 +29,13 @@ void Sampler::sample(bool acceptedStep) {
     /* Here you should sample all the interesting things you want to measure.
      * Note that there are (way) more than the single one here currently.
      */
-    
+
     double localEnergy = m_system->getHamiltonian()->
                          computeLocalEnergy(m_system->getParticles());
     m_cumulativeEnergy  += localEnergy;
+
+    m_cumulativeEnergySquared += localEnergy*localEnergy;
+
     m_stepNumber++;
 }
 
@@ -59,6 +62,7 @@ void Sampler::printOutputToTerminal() {
     cout << endl;
     cout << "  -- Results -- " << endl;
     cout << " Energy : " << m_energy << endl;
+    cout << " Variance : " <<  m_energySquared - m_energy*m_energy << endl;
     cout << endl;
 }
 
@@ -68,4 +72,5 @@ void Sampler::computeAverages() {
      * Take away the non-physical stuff before eqilibrium - so not all steps
      */
     m_energy = m_cumulativeEnergy / m_system->getNumberOfMetropolisSteps();
+    m_energySquared = m_cumulativeEnergySquared / m_system->getNumberOfMetropolisSteps();
 }

@@ -53,3 +53,16 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     return kineticEnergy + potentialEnergy;
 }
 
+std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Particle*> particles){
+
+    /* Should maybe add the possibility of choosing nummerical derivative? */
+
+    auto derivative = m_system->getWaveFunction()->computeDerivative(particles);
+
+    for (int m=0;m<m_system->getNumberOfDimensions();m++){
+        derivative[m] *= -4*m_system->getWaveFunction()->getParameters()[0];
+    }
+
+    return derivative;
+}
+

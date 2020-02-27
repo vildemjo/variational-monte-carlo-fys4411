@@ -19,8 +19,8 @@ int main() {
     double omega            = 1.0;          // Oscillator frequency.
     double alpha            = 0.5;          // Variational parameter.
     double stepLength       = 0.1;          // Metropolis step length.
-    double equilibration    = 0.1;          // Amount of the total steps used
-    // for equilibration.
+    double equilibration    = 0.1;          // Amount of the total steps used for equilibration
+    double timeStep         = 1e-2;
 
     System* system = new System();
     system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -29,6 +29,7 @@ int main() {
     system->setEquilibrationFraction    (equilibration);
     system->setStepLength               (stepLength);
     system->setAnalytical               (true);
+    system->setImportanceSampling       (true, timeStep);
     system->runMetropolisSteps          (numberOfSteps);
     return 0;
 }
