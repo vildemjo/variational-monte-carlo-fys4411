@@ -83,7 +83,7 @@ bool System::metropolisStep() {
         }
     
     return false;
-    
+
     }
     
 }
@@ -94,16 +94,17 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
 
+    
     for (int i=0; i < numberOfMetropolisSteps; i++) {
         
         bool acceptedStep = metropolisStep();
 
         /* Here you should sample the energy (and maybe other things using
-         * the m_sampler instance of the Sampler class. Make sure, though,
-         * to only begin sampling after you have let the system equilibrate
-         * for a while. You may handle this using the fraction of steps which
-         * are equilibration steps; m_equilibrationFraction.
-         */
+        * the m_sampler instance of the Sampler class. Make sure, though,
+        * to only begin sampling after you have let the system equilibrate
+        * for a while. You may handle this using the fraction of steps which
+        * are equilibration steps; m_equilibrationFraction.
+        */
         
         m_sampler->sample(acceptedStep);
     }
@@ -157,3 +158,4 @@ double System::greensFunctionFraction(std::vector<double> posNew, std::vector<do
     }
     return exp(exponent);
 }
+

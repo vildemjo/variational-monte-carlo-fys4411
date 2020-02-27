@@ -52,23 +52,23 @@ void Sampler::printOutputToTerminal() {
     std::vector<double> pa = m_system->getWaveFunction()->getParameters();
 
     cout << endl;
-    cout << "  -- System info -- " << endl;
-    cout << " Number of particles  : " << np << endl;
-    cout << " Number of dimensions : " << nd << endl;
-    cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
-    cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
-    cout << " Accepted steps: " << ac << " %" << endl;
-    cout << endl;
-    cout << "  -- Wave function parameters -- " << endl;
-    cout << " Number of parameters : " << p << endl;
-    for (int i=0; i < p; i++) {
-        cout << " Parameter " << i+1 << " : " << pa.at(i) << endl;
-    }
-    cout << endl;
-    cout << "  -- Results -- " << endl;
+    // cout << "  -- System info -- " << endl;
+    // cout << " Number of particles  : " << np << endl;
+    // cout << " Number of dimensions : " << nd << endl;
+    // cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
+    // cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
+    // cout << " Accepted steps: " << ac << " %" << endl;
+    // cout << endl;
+    // cout << "  -- Wave function parameters -- " << endl;
+    // cout << " Number of parameters : " << p << endl;
+    // for (int i=0; i < p; i++) {
+    //     cout << " Parameter " << i+1 << " : " << pa.at(i) << endl;
+    // }
+    // cout << endl;
+    // cout << "  -- Results -- " << endl;
     cout << " Energy : " << m_energy << endl;
-    cout << " Variance : " <<  m_energySquared - m_energy*m_energy << endl;
-    cout << endl;
+    // cout << " Variance : " <<  m_energySquared - m_energy*m_energy << endl;
+    // cout << endl;
 }
 
 void Sampler::computeAverages() {
