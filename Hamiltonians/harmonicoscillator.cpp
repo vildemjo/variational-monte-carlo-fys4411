@@ -84,6 +84,6 @@ double HarmonicOscillator::computeEnergyDerivative(std::vector<class Particle*> 
         }
     }
 
-    return (-hbar*hbar/2*m)*(-2*numberOfDimentions*numberOfParticles + 8*alpha*rSum);
+    return (-hbar*hbar/(2*m))*(-2*numberOfDimentions*numberOfParticles + 8*alpha*rSum);
 }
 

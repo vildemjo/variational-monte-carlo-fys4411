@@ -111,7 +111,8 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, bool statement, int
         m_sampler->sample(acceptedStep);
     }
     m_sampler->computeAverages();
-    if (m_printToFileOrNot = false){
+    
+    if (m_printToFileOrNot == false){
     m_sampler->printOutputToTerminal();
     }
     else{

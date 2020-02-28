@@ -1,6 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include "system.h"
 #include "particle.h"
+#include "sampler.h"
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
 #include "Hamiltonians/hamiltonian.h"
@@ -26,12 +28,12 @@ int main() {
     bool analyticOrNot = true;
     bool importanceOrNot = true;
 
-    bool gradientDescent = false;
-    double minimizationRate = 2.0;
-    double alphaGuess = 0.45;
+    bool gradientDescent = true;
+    double minimizationRate = 0.05;
+    double alphaGuess = 0.6;
     double stopCriteria = 1e-9;
 
-    bool alphaList = true;
+    bool alphaList = false;
     double alphaStart = 0.6;
     double alphaStop = 0.4;
     double alphaStep = 0.01;
@@ -43,8 +45,6 @@ int main() {
     if(alphaList == true){
         alphaListRun(alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot);
     }
-
-
 
     end = clock(); 
 
@@ -68,10 +68,12 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
     double alphaChange      = 0.5;
     double alphaNew = alpha;
 
-    for (int k=0;  alphaChange > m_stopCriteria; k++){
+    ofstream file;
+    file.open ("Output/gradient_descent.txt", ios::out | ios::trunc);
+    file << "Alpha: \t Energy: \t Derivative: \n";
+    file.close();
 
-        std::cout << " alpha: " << alpha << endl;
-        std::cout << " derivative: " << energyDerivative << endl;
+    for (int k=0;  alphaChange > m_stopCriteria; k++){
 
         int numberOfDimensions  = 1;
         int numberOfParticles   = 1;
@@ -80,6 +82,8 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
         double stepLength       = 0.5;          // Metropolis step length.
         double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
         double timeStep         = 1e-2;
+        bool printToFileOrNot   = false;
+        double energy           = 0;
 
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -89,17 +93,23 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
         system->setStepLength               (stepLength);
         system->setAnalytical               (analyticOrNot);
         system->setImportanceSampling       (importanceOrNot, timeStep);
-        system->runMetropolisSteps          (numberOfSteps, true, firstCriteria);
+        system->runMetropolisSteps          (numberOfSteps, printToFileOrNot, firstCriteria);
     
         firstCriteria = 1;
         
+        energy = system->getSampler()->getEnergy();
         energyDerivative = system->getHamiltonian()->computeEnergyDerivative(system->getParticles());
         alphaNew = alpha - m_minimizationRate*energyDerivative/numberOfParticles;
-
+        
         alphaChange = std::abs(alphaNew-alpha);
         alpha = alphaNew;
 
+        file.open ("Output/gradient_descent.txt", ios::out | ios::app);
+        file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
+        file.close();
+        
     }
+    
 
 }
 
