@@ -7,6 +7,7 @@
 #include "Hamiltonians/hamiltonian.h"
 #include "InitialStates/initialstate.h"
 #include "Math/random.h"
+#include <string>
 
 bool System::metropolisStep() {
     /* Perform the actual Metropolis step: Choose a particle at random and
@@ -88,13 +89,14 @@ bool System::metropolisStep() {
     
 }
 
-void System::runMetropolisSteps(int numberOfMetropolisSteps) {
+void System::runMetropolisSteps(int numberOfMetropolisSteps, bool statement, int firstCriteria) {
     m_particles                 = m_initialState->getParticles();
     m_sampler                   = new Sampler(this);
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
+    m_sampler->setFileOutput(firstCriteria);
+    m_printToFileOrNot = statement;
 
-    
     for (int i=0; i < numberOfMetropolisSteps; i++) {
         
         bool acceptedStep = metropolisStep();
@@ -109,7 +111,12 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps) {
         m_sampler->sample(acceptedStep);
     }
     m_sampler->computeAverages();
+    if (m_printToFileOrNot = false){
     m_sampler->printOutputToTerminal();
+    }
+    else{
+    m_sampler->printOutputToFile();
+    }
 }
 
 void System::setNumberOfParticles(int numberOfParticles) {
@@ -150,6 +157,7 @@ void System::setImportanceSampling(bool statement, double timeStep){
     m_importanceSampling = statement;
     m_timeStep = timeStep;
 }
+
 
 double System::greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld){
     double exponent;

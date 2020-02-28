@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <vector>
 #include "sampler.h"
@@ -7,8 +8,7 @@
 #include "Hamiltonians/hamiltonian.h"
 #include "WaveFunctions/wavefunction.h"
 
-using std::cout;
-using std::endl;
+using namespace std;
 
 
 Sampler::Sampler(System* system) {
@@ -52,23 +52,49 @@ void Sampler::printOutputToTerminal() {
     std::vector<double> pa = m_system->getWaveFunction()->getParameters();
 
     cout << endl;
-    // cout << "  -- System info -- " << endl;
-    // cout << " Number of particles  : " << np << endl;
-    // cout << " Number of dimensions : " << nd << endl;
-    // cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
-    // cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
-    // cout << " Accepted steps: " << ac << " %" << endl;
-    // cout << endl;
-    // cout << "  -- Wave function parameters -- " << endl;
-    // cout << " Number of parameters : " << p << endl;
-    // for (int i=0; i < p; i++) {
-    //     cout << " Parameter " << i+1 << " : " << pa.at(i) << endl;
-    // }
-    // cout << endl;
-    // cout << "  -- Results -- " << endl;
+    cout << "  -- System info -- " << endl;
+    cout << " Number of particles  : " << np << endl;
+    cout << " Number of dimensions : " << nd << endl;
+    cout << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
+    cout << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
+    cout << " Accepted steps: " << ac << " %" << endl;
+    cout << endl;
+    cout << "  -- Wave function parameters -- " << endl;
+    cout << " Number of parameters : " << p << endl;
+    for (int i=0; i < p; i++) {
+        cout << " Parameter " << i+1 << " : " << pa.at(i) << endl;
+    }
+    cout << endl;
+    cout << "  -- Results -- " << endl;
     cout << " Energy : " << m_energy << endl;
-    // cout << " Variance : " <<  m_energySquared - m_energy*m_energy << endl;
-    // cout << endl;
+    cout << " Variance : " <<  m_energySquared - m_energy*m_energy << endl;
+    cout << endl;
+}
+
+void Sampler::printOutputToFile(){
+    
+    ofstream myfile;
+    double alpha = m_system->getWaveFunction()->getParameters()[0];
+
+    if (m_firstCriteria == 0) { 
+        // Setting the correct filename for the different settings
+        if (m_system->getImportanceSampling() == true){
+            myfile.open ("Output/MC7_energy_alpha_imp.txt", ios::out | ios::trunc);
+        }
+        else{
+            myfile.open ("Output/MC7_energy_alpha.txt", ios::out | ios::trunc);
+        }
+        myfile << "Energy: \t Alpha: \n"; 
+        myfile.close(); 
+    }
+        if (m_system->getImportanceSampling()== true){
+            myfile.open ("Output/MC7_energy_alpha_imp.txt", ios::out | ios::app);
+        }
+        else{
+            myfile.open ("Output/MC7_energy_alpha.txt", ios::out | ios::app);
+        }
+    myfile << m_energy << "\t" << alpha << "\n";
+    myfile.close();
 }
 
 void Sampler::computeAverages() {
@@ -80,4 +106,9 @@ void Sampler::computeAverages() {
                                     (1-m_system->getEquilibrationFraction()));
     m_energySquared = m_cumulativeEnergySquared / (m_system->getNumberOfMetropolisSteps()*
                                                     (1-m_system->getEquilibrationFraction()));
+}
+
+void Sampler::setFileOutput(int firstCriteria){
+    m_firstCriteria = firstCriteria;
+    // m_filename = filename;
 }

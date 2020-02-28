@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 
+
 class System {
 public:
     bool metropolisStep             ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps);
+    void runMetropolisSteps         (int numberOfMetropolisSteps,bool statement, int firstCriteria);
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
     void setStepLength              (double stepLength);
@@ -33,6 +34,7 @@ private:
     int                             m_numberOfMetropolisSteps = 0;
     bool                            m_analytical = false;
     bool                            m_importanceSampling = false;
+    bool                            m_printToFileOrNot = false;
     double                          m_diffConstant = 0.5;
     double                          m_timeStep = 0;
     double                          m_equilibrationFraction = 0.0;
