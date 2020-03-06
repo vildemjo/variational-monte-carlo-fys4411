@@ -29,8 +29,8 @@ int main() {
     bool importanceOrNot = true;
 
     bool gradientDescent = true;
-    double minimizationRate = 0.05;
-    double alphaGuess = 0.6;
+    double minimizationRate = 0.1;
+    double alphaGuess = 0.4;
     double stopCriteria = 1e-9;
 
     bool alphaList = false;
@@ -40,7 +40,7 @@ int main() {
     
 
     if (gradientDescent == true){
-        gradientDecentRun(alphaGuess, minimizationRate, stopCriteria ,analyticOrNot, importanceOrNot);
+        gradientDecentRun(alphaGuess, minimizationRate, stopCriteria, analyticOrNot, importanceOrNot);
     }
     if(alphaList == true){
         alphaListRun(alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot);
@@ -59,21 +59,26 @@ int main() {
 
 void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCriteria, bool analyticOrNot, bool importanceOrNot){
 
-    int firstCriteria = 0;                  // Criteria to print header in outputfile
+    int firstCriteria               = 0;                  // Criteria to print header in outputfile
 
-    double alpha = alphaGuess;                     // Variational parameter first guess
-    double m_stopCriteria     = stopCriteria;         // Stopping criteria for energy vs exact energy.
-    double m_minimizationRate = minimizationRate;         // Model for double derivative of energy.
-    double energyDerivative = 1.0;
-    double alphaChange      = 0.5;
-    double alphaNew = alpha;
+    double alpha                    = alphaGuess;         // Variational parameter first guess
+    double m_stopCriteria           = stopCriteria;       // Stopping criteria for energy vs exact energy.
+    double m_minimizationRate       = minimizationRate;   // Model for double derivative of energy.
+    double energyDerivative         = 1.0;
+    double alphaChange              = 0.5;
+    double energyChange             = 1;
+    double alphaNew                 = alpha;
+    double energyNew                = 0.8; 
+    double gradientPrintToFileOrNot = false;
 
     ofstream file;
-    file.open ("Output/gradient_descent.txt", ios::out | ios::trunc);
-    file << "Alpha: \t Energy: \t Derivative: \n";
-    file.close();
+    if (gradientPrintToFileOrNot == true){
+        file.open ("Output/gradient_descent.txt", ios::out | ios::trunc);
+        file << "Alpha: \t Energy: \t Derivative: \n";
+        file.close();
+    }
 
-    for (int k=0;  alphaChange > m_stopCriteria; k++){
+    for (int k=0;  energyChange > m_stopCriteria; k++){
 
         int numberOfDimensions  = 1;
         int numberOfParticles   = 1;
@@ -84,6 +89,7 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
         double timeStep         = 1e-2;
         bool printToFileOrNot   = false;
         double energy           = 0;
+    
 
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -97,16 +103,19 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
     
         firstCriteria = 1;
         
-        energy = system->getSampler()->getEnergy();
-        energyDerivative = system->getHamiltonian()->computeEnergyDerivative(system->getParticles());
+        energyNew = system->getSampler()->getEnergy();
+        energyDerivative = system->getSampler()->getDerivative();
         alphaNew = alpha - m_minimizationRate*energyDerivative/numberOfParticles;
         
-        alphaChange = std::abs(alphaNew-alpha);
+        energyChange = std::abs(energyNew - energy);
         alpha = alphaNew;
+        energy = energyNew;
 
-        file.open ("Output/gradient_descent.txt", ios::out | ios::app);
-        file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
-        file.close();
+        if (gradientPrintToFileOrNot == true){
+            file.open ("Output/gradient_descent.txt", ios::out | ios::app);
+            file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
+            file.close();
+        }
         
     }
     

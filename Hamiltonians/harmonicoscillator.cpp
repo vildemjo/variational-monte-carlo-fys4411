@@ -27,7 +27,6 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     double hbar = 1.0;
     double m = 1.0;
-    double omega = 1.0;
 
     double rSum2 = 0.0;
 
@@ -42,7 +41,7 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     double doubleDerivative;
 
-    double potentialEnergy = 0.5*m*omega*rSum2;
+    double potentialEnergy = 0.5*m*m_omega*rSum2;
 
     // Calculating the normalized second derivative either analytically or numerically
     if (m_system->getAnalytical() == true){
@@ -52,6 +51,7 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
     double kineticEnergy   = (-hbar*hbar/(2*m))*doubleDerivative;
+    
     return kineticEnergy + potentialEnergy;
 }
 
@@ -69,21 +69,30 @@ std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Pa
 }
 
 double HarmonicOscillator::computeEnergyDerivative(std::vector<class Particle*> particles){
-    double hbar = 1.0;
-    double m = 1.0;
+    /* OBS! This only calculates part of the derivative. The rest is done in Sampler */
+    // double hbar = 1.0;
+    // double m = 1.0;
     
-    int numberOfParticles = m_system->getNumberOfParticles();
-    int numberOfDimentions = m_system->getNumberOfDimensions();
-    double alpha = m_system->getWaveFunction()->getParameters()[0];
-    double rSum;
+    // int numberOfParticles = m_system->getNumberOfParticles();
+    // int numberOfDimentions = m_system->getNumberOfDimensions();
+    // double alpha = m_system->getWaveFunction()->getParameters()[0];
+    // double rSum;
+    // double rSum2;
 
-    for (int i9 = 0; i9<numberOfParticles;i9++){
-        auto r = particles[i9]->getPosition();
-        for (int n9=0; n9<numberOfDimentions; n9++){
-            rSum += r[n9];
-        }
-    }
+    double expectationDerivative;
 
-    return (-hbar*hbar/(2*m))*(-2*numberOfDimentions*numberOfParticles + 8*alpha*rSum);
+
+    // for (int i9 = 0; i9<numberOfParticles;i9++){
+    //     auto r = particles[i9]->getPosition();
+    //     for (int n9=0; n9<numberOfDimentions; n9++){
+    //         rSum += r[n9];
+    //         rSum2 += r[n9]*r[n9];
+    //     }
+    // }
+
+    // expectationDerivative = hbar*hbar/(2*m)*rSum*(2-alpha)-0.5*m*m_omega*m_omega*rSum2*rSum2;
+    
+    expectationDerivative = computeLocalEnergy(particles)*m_system->getWaveFunction()->computeAlphaDerivative(particles);
+
+    return expectationDerivative;
 }
-

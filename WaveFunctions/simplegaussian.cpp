@@ -79,3 +79,17 @@ std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle
 }
 
 
+double SimpleGaussian::computeAlphaDerivative(std::vector<class Particle*> particles){
+
+    double vectorSumSquared;
+
+    for (int i10 = 0; i10<m_system->getNumberOfParticles();i10++){
+        auto r = particles[i10]->getPosition();
+        for (int n10=0; n10<m_system->getNumberOfDimensions(); n10++){
+            vectorSumSquared += r[n10]*r[n10];
+        }
+    }
+
+    return (-1)*vectorSumSquared;
+
+}

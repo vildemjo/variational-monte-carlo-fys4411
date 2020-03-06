@@ -31,12 +31,16 @@ void Sampler::sample(bool acceptedStep) {
      * Note that there are (way) more than the single one here currently.
      */
     // Sampling if the equilibrium stage is passed
-    if (m_stepNumber > m_system->getEquilibrationFraction()*m_system->getNumberOfMetropolisSteps()){
-        double localEnergy = m_system->getHamiltonian()->
-                            computeLocalEnergy(m_system->getParticles());
-        m_cumulativeEnergy  += localEnergy;
+    double localEnergy;
 
+    if (m_stepNumber > m_system->getEquilibrationFraction()*m_system->getNumberOfMetropolisSteps()){
+        localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
+        m_cumulativeEnergy  += localEnergy;
         m_cumulativeEnergySquared += localEnergy*localEnergy;
+        m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+        //m_cumulativeEnergyDerivative += m_system->getHamiltonian()->computeEnergyDerivative(m_system->getParticles());
+        m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+
     }
 
     m_stepNumber++;
@@ -102,10 +106,14 @@ void Sampler::computeAverages() {
      * thoroughly through what is written here currently; is this correct?
      * Take away the non-physical stuff before eqilibrium - so not all steps
      */
-    m_energy = m_cumulativeEnergy / (m_system->getNumberOfMetropolisSteps()*
+
+    int numberOfCyclesIncluded = (m_system->getNumberOfMetropolisSteps()*
                                     (1-m_system->getEquilibrationFraction()));
-    m_energySquared = m_cumulativeEnergySquared / (m_system->getNumberOfMetropolisSteps()*
-                                                    (1-m_system->getEquilibrationFraction()));
+
+    m_energy = m_cumulativeEnergy / numberOfCyclesIncluded;
+    m_energySquared = m_cumulativeEnergySquared / numberOfCyclesIncluded;
+    m_derivative = 2*m_cumulativeEnergyDerivative / numberOfCyclesIncluded
+                    - 2*(m_cumulativeAlphaDerivative / numberOfCyclesIncluded)*m_energy;
 }
 
 void Sampler::setFileOutput(int firstCriteria){
