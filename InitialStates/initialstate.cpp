@@ -42,6 +42,9 @@ void InitialState::updateDistances(int particleNumber){
     assert(particleNumber < m_numberOfParticles);
     
     std::vector <double> difference(m_numberOfParticles);
+
+
+
     auto r1 = m_particles[particleNumber]->getPosition();
     double a = m_system->getHardCoreDiameter();
 
@@ -56,4 +59,20 @@ void InitialState::updateDistances(int particleNumber){
         }
     }
     m_distances[particleNumber] = difference;
+}
+
+std::vector<double> InitialState::evaluateDifferenceVector(){
+
+    std::vector <double> differenceVector(m_numberOfDimensions);
+
+    for (int k1 = 0; k1 < m_numberOfParticles-1; k1++){
+        auto r1 = m_particles[k1]->getPosition();
+        for (int k2 = k1+1; k2 <m_numberOfParticles; k2++){
+            auto r2 = m_particles[k2]->getPosition();
+            for (int k3 = 0; k3<m_numberOfDimensions; k3++){
+                differenceVector[k3] += r1[k3]-r2[k3];
+            }
+        }
+    }
+    return differenceVector;
 }

@@ -9,7 +9,8 @@ public:
     void calculateInterparticleDistances();
     void setDistances(std::vector<std::vector<double>> distances);
     void updateDistances(int particleNumber);
-    
+    std::vector<double> evaluateDifferenceVector();
+    std::vector<std::vector<double>> getDistances() { return m_distances; }
 
 protected:
     class System* m_system = nullptr;

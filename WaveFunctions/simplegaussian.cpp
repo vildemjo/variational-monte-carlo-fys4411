@@ -3,6 +3,7 @@
 #include <cassert>
 #include "wavefunction.h"
 #include "../particle.h"
+#include "InitialStates/initialstate.h"
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
         WaveFunction(system) {
@@ -29,6 +30,26 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
     double interactionPart = 1;
 
    if (m_system->getInteractionOrNot() == true){
+       /* Write a sum over all particles where j<k. Check if r_jk > a. (else: f = 0 and u = ln(f) = 1) 
+       then u = ln (1-a/r_jk)*/
+
+        auto a = m_system->getHardCoreDiameter();
+        double uSum = 0;
+
+        auto distances = m_system->getInitialState()->getDistances();
+
+        for (int j1 = 0; j1 < numberOfParticles-1; j1++){
+            auto distances_j1 = distances[j1];
+            for (int j2 = j1+1; j2 <numberOfParticles; j2++){
+                auto distances_j1_j2 = distances_j1[j2];
+                if ( distances_j1_j2 <= a ) {
+                    uSum += 1;
+                }else{
+                    uSum += log(1-a/distances_j1_j2);
+                }
+            }
+        }
+        interactionPart = exp(uSum);
 
    }
 
