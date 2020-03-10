@@ -159,6 +159,11 @@ void System::setImportanceSampling(bool statement, double timeStep){
     m_timeStep = timeStep;
 }
 
+void System::setInteractionOrNot(bool statement, double hardCoreDiameter){
+    m_interactionOrNot = statement;
+    m_hardCoreDiameter = hardCoreDiameter;
+}
+
 double System::greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld){
     double exponent;
     for (int n10=0; n10<m_numberOfDimensions; n10++){

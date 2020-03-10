@@ -51,3 +51,9 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
     return (1/waveCurrent)*dpsidr2;
  
 }
+
+void Hamiltonian::setInteractionPotential(bool statement){
+    if (statement == true){
+        m_interactionPotential = 1e20;
+    }
+}

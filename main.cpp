@@ -15,7 +15,7 @@
 using namespace std;
 
 void gradientDecentRun(double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance);
-void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance);
+void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance,bool interactionOrNot, double hardCoreDiameter);
 
 int main() {
 
@@ -27,16 +27,18 @@ int main() {
 
     bool analyticOrNot = true;
     bool importanceOrNot = true;
+    bool interactionOrNot = true;
+    double hardCoreDiameter = 0.5;
 
-    bool gradientDescent = true;
+    bool gradientDescent = false;
     double minimizationRate = 0.1;
     double alphaGuess = 0.4;
     double stopCriteria = 1e-9;
 
-    bool alphaList = false;
+    bool alphaList = true;
     double alphaStart = 0.6;
     double alphaStop = 0.4;
-    double alphaStep = 0.01;
+    double alphaStep = 0.05;
     
 
     if (gradientDescent == true){
@@ -57,7 +59,13 @@ int main() {
     return 0;
 }
 
-void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCriteria, bool analyticOrNot, bool importanceOrNot){
+void gradientDecentRun(double alphaGuess, 
+                    double minimizationRate, 
+                    double stopCriteria, 
+                    bool analyticOrNot, 
+                    bool importanceOrNot, 
+                    bool interactionOrNot, 
+                    double hardCoreDiameter){
 
     int firstCriteria               = 0;                  // Criteria to print header in outputfile
 
@@ -99,6 +107,7 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
         system->setStepLength               (stepLength);
         system->setAnalytical               (analyticOrNot);
         system->setImportanceSampling       (importanceOrNot, timeStep);
+        system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter);
         system->runMetropolisSteps          (numberOfSteps, printToFileOrNot, firstCriteria);
     
         firstCriteria = 1;
@@ -122,7 +131,7 @@ void gradientDecentRun(double alphaGuess, double minimizationRate, double stopCr
 
 }
 
-void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance){
+void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importanceOrNot){
     int firstCriteria = 0;                  // Criteria to print header in outputfile
 
     double alpha = alphaStart;
@@ -131,11 +140,12 @@ void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool an
         double stopCriteria     = 1e-9;         // Stopping criteria for energy vs exact energy.
         int numberOfDimensions  = 1;
         int numberOfParticles   = 1;
-        int numberOfSteps       = (int) 1e7;
+        int numberOfSteps       = (int) 1e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.
         double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
         double timeStep         = 1e-2;
+        bool printToFileOrNot   = false;
 
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -144,8 +154,8 @@ void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool an
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->setAnalytical               (analytic);
-        system->setImportanceSampling       (importance, timeStep);
-        system->runMetropolisSteps          (numberOfSteps, true, firstCriteria);
+        system->setImportanceSampling       (importanceOrNot, timeStep);
+        system->runMetropolisSteps          (numberOfSteps, printToFileOrNot, firstCriteria);
             
         alpha -= alphaStep;
         firstCriteria = 1;

@@ -1,6 +1,7 @@
 #include "particle.h"
 #include <cassert>
 #include "system.h"
+#include "InitialStates/initialstate.h"
 
 Particle::Particle(System* system) {
     m_system = system;

@@ -2,7 +2,6 @@
 #include <cmath>
 #include <cassert>
 #include "wavefunction.h"
-#include "../system.h"
 #include "../particle.h"
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
@@ -14,20 +13,11 @@ SimpleGaussian::SimpleGaussian(System* system, double alpha) :
 }
 
 double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
-    /* You need to implement a Gaussian wave function here. The positions of
-     * the particles are accessible through the particles[i].getPosition()
-     * function.
-     *
-     * For the actual expression, use exp(-alpha * r^2), with alpha being the
-     * (only) variational parameter.
-     */
 
     double rSum = 0.0;
 
     int numberOfParticles = particles.size();
     int numberOfDimensions = particles[0]->getPosition().size();
-
-    // std::vector<double> r = std::vector<double>();
 
     for(int i1=0; i1<numberOfParticles; i1++){
         auto r = particles[i1]->getPosition();
@@ -38,42 +28,9 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
 
     double interactionPart = 1;
 
-    /* 
-    
-    double rDiff;
-    double rDiffTotal;
-    auto rParticlei = particles[0]->getPosition();
-    auto rParticlej = particles[0]->getPosition();
+   if (m_system->getInteractionOrNot() == true){
 
-    matrix rDiffs = (numberOfParticles, numberOfParticles);
-
-    if (m_system->getInteraction() == true){
-
-        for(int i1=1; i1<numberOfParticles; i1++){
-            auto rParticlei = particles[i1]->getPosition()
-            for(int i2=1; i2<numberOfParticles; i2++){
-
-                auto rParticlej = particles[i2]->getPosition();
-                if (i1 > i2){
-                    for(int n1=0; n1<numberOfDimensions; n1++){
-                        rDiff = rParticlei[n1]-rParticlej[n1];   // x_i-x_j
-                        rDiffTotal += rDiff*rDiff;               // (x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2
-                    }
-                rDiffTotal = sqrt(rDiffTotal);                   // sqrt((x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2)      
-                rDiffs[i1][i2] = rDiffTotal;                     // Hvordan få denne til å funke?
-                }            
-
-            }
-        
-        auto rOld = rNew;
-    }
-
-
-    }
-
-
-
-    */
+   }
 
     return exp(-m_parameters[0]*rSum)*interactionPart;
 
@@ -100,17 +57,43 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
             rSum2 += r[n2]*r[n2];
         }   
     }
-    return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2);
+    double interactionPart = 0;
+
+    if (m_system->getInteractionOrNot == true){
+        interactionPart = computeInteractionPartOfDoubleDerivative(particles);
+    }
+
+
+    return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2) + interactionPart;
+}
+
+double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles){
+
+    double firstTerm; double secondTerm; double thirdTerm;
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimentions = m_system->getNumberOfDimensions();
+
+    auto derivativePhi = computeDerivative(particles);
+    // auto distanceVector = computeInteractingDerivative(particles);
+
+    for (int j5 = 0; j5<numberOfDimentions; j5++){
+        // firstTerm += derivativePhi[j5]*distanceVector[j5];
+    }
+
+    firstTerm = 2;
+
+    return firstTerm + secondTerm + thirdTerm;
 }
 
 std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle*> particles){
     
+    /* */
     std::vector<double> vectorSum(m_system->getNumberOfDimensions());
 
     for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
         auto r = particles[i8]->getPosition();
         for (int n8=0; n8<m_system->getNumberOfDimensions(); n8++){
-            vectorSum[n8] += r[n8];
+            vectorSum[n8] += -2*getParameters()[0]*r[n8];
         }
     }
 
