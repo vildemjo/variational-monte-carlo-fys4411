@@ -45,8 +45,12 @@ void RandomUniform::setupInitialState() {
 
             position.push_back(m_system->getStepLength()*(Random::nextDouble()-0.5));
         }
-        m_particles.push_back(new Particle());
+        m_particles.push_back(new Particle(m_system));
         m_particles.at(m3)->setNumberOfDimensions(m_numberOfDimensions);
         m_particles.at(m3)->setPosition(position);
+        m_particles.at(m3)->setParticleIndex(m3);
     }
+
+    calculateInterparticleDistances();
+
 }

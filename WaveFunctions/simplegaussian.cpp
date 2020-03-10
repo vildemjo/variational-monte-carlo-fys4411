@@ -35,9 +35,48 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
             rSum += r[n1]*r[n1];
         }
     }
-    return exp(-m_parameters[0]*rSum);
 
-    return 0;
+    double interactionPart = 1;
+
+    /* 
+    
+    double rDiff;
+    double rDiffTotal;
+    auto rParticlei = particles[0]->getPosition();
+    auto rParticlej = particles[0]->getPosition();
+
+    matrix rDiffs = (numberOfParticles, numberOfParticles);
+
+    if (m_system->getInteraction() == true){
+
+        for(int i1=1; i1<numberOfParticles; i1++){
+            auto rParticlei = particles[i1]->getPosition()
+            for(int i2=1; i2<numberOfParticles; i2++){
+
+                auto rParticlej = particles[i2]->getPosition();
+                if (i1 > i2){
+                    for(int n1=0; n1<numberOfDimensions; n1++){
+                        rDiff = rParticlei[n1]-rParticlej[n1];   // x_i-x_j
+                        rDiffTotal += rDiff*rDiff;               // (x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2
+                    }
+                rDiffTotal = sqrt(rDiffTotal);                   // sqrt((x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2)      
+                rDiffs[i1][i2] = rDiffTotal;                     // Hvordan få denne til å funke?
+                }            
+
+            }
+        
+        auto rOld = rNew;
+    }
+
+
+    }
+
+
+
+    */
+
+    return exp(-m_parameters[0]*rSum)*interactionPart;
+
 }
 
 double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> particles) {
