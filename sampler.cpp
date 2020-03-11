@@ -82,21 +82,14 @@ void Sampler::printOutputToFile(){
 
     if (m_firstCriteria == 0) { 
         // Setting the correct filename for the different settings
-        if (m_system->getImportanceSampling() == true){
-            myfile.open ("Output/MC7_energy_alpha_imp.txt", ios::out | ios::trunc);
-        }
-        else{
-            myfile.open ("Output/MC7_energy_alpha.txt", ios::out | ios::trunc);
-        }
+
+        myfile.open (m_system->getFileName(), ios::out | ios::trunc);
         myfile << "Energy: \t Alpha: \n"; 
         myfile.close(); 
     }
-        if (m_system->getImportanceSampling()== true){
-            myfile.open ("Output/MC7_energy_alpha_imp.txt", ios::out | ios::app);
-        }
-        else{
-            myfile.open ("Output/MC7_energy_alpha.txt", ios::out | ios::app);
-        }
+        
+    myfile.open (m_system->getFileName(), ios::out | ios::app);
+        
     myfile << m_energy << "\t" << alpha << "\n";
     myfile.close();
 }

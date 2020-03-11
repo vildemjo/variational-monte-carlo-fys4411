@@ -80,7 +80,7 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     }
     double interactionPart = 0;
 
-    if (m_system->getInteractionOrNot == true){
+    if (m_system->getInteractionOrNot() == true){
         interactionPart = computeInteractionPartOfDoubleDerivative(particles);
     }
 

@@ -47,6 +47,7 @@ void InitialState::updateDistances(int particleNumber){
 
     auto r1 = m_particles[particleNumber]->getPosition();
     double a = m_system->getHardCoreDiameter();
+    int checkDistance = 0;
 
     for(int j4 = particleNumber+1; j4<m_numberOfParticles; j4++){
         auto r2 = m_particles[particleNumber]->getPosition();
@@ -55,10 +56,13 @@ void InitialState::updateDistances(int particleNumber){
         }
         difference[j4] = sqrt(difference[j4]);
         if (difference[j4] < a){
-            m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
+            checkDistance += 1;  // Telling the interaction potential that a distance is smaller than a
         }
     }
     m_distances[particleNumber] = difference;
+    if (checkDistance > 0){
+        m_system->getHamiltonian()->setInteractionPotential(true);
+    } // If not it stays as it was after initialization (Should I add something that makes sure that it is ok after initialization?)
 }
 
 std::vector<double> InitialState::evaluateDifferenceVector(){

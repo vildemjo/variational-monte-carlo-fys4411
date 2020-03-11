@@ -55,5 +55,7 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
 void Hamiltonian::setInteractionPotential(bool statement){
     if (statement == true){
         m_interactionPotential = 1e20;
+    }else{
+        m_interactionPotential = 0;
     }
 }

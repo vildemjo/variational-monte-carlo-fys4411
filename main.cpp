@@ -14,21 +14,19 @@
 
 using namespace std;
 
-void gradientDecentRun(double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance);
-void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance,bool interactionOrNot, double hardCoreDiameter);
+void gradientDecentRun(string filename, double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter);
+void alphaListRun(string filename, double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter);
 
 int main() {
 
     clock_t start, end;
     /* Recording the starting clock tick.*/
-    start = clock(); 
+    start = clock();
 
-
-
-    bool analyticOrNot = true;
-    bool importanceOrNot = true;
+    bool analyticOrNot = false;
+    bool importanceOrNot = false;
     bool interactionOrNot = true;
-    double hardCoreDiameter = 0.5;
+    double hardCoreDiameter = 0.05;
 
     bool gradientDescent = false;
     double minimizationRate = 0.1;
@@ -36,16 +34,17 @@ int main() {
     double stopCriteria = 1e-9;
 
     bool alphaList = true;
-    double alphaStart = 0.6;
-    double alphaStop = 0.4;
+    double alphaStart = 0.7;
+    double alphaStop = 0.3;
     double alphaStep = 0.05;
+    string filename = "NoInt_energy_alpha.txt";
     
 
     if (gradientDescent == true){
-        gradientDecentRun(alphaGuess, minimizationRate, stopCriteria, analyticOrNot, importanceOrNot);
+        gradientDecentRun(filename, alphaGuess, minimizationRate, stopCriteria, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter);
     }
     if(alphaList == true){
-        alphaListRun(alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot);
+        alphaListRun(filename, alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter);
     }
 
     end = clock(); 
@@ -59,7 +58,8 @@ int main() {
     return 0;
 }
 
-void gradientDecentRun(double alphaGuess, 
+void gradientDecentRun(string filename, 
+                    double alphaGuess, 
                     double minimizationRate, 
                     double stopCriteria, 
                     bool analyticOrNot, 
@@ -131,7 +131,15 @@ void gradientDecentRun(double alphaGuess,
 
 }
 
-void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importanceOrNot){
+void alphaListRun(string filename,
+                double alphaStart,
+                double alphaStop, 
+                double alphaStep, 
+                bool analytic, 
+                bool importanceOrNot,
+                bool interactionOrNot, 
+                double hardCoreDiameter){
+
     int firstCriteria = 0;                  // Criteria to print header in outputfile
 
     double alpha = alphaStart;
@@ -139,13 +147,13 @@ void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool an
 
         double stopCriteria     = 1e-9;         // Stopping criteria for energy vs exact energy.
         int numberOfDimensions  = 1;
-        int numberOfParticles   = 1;
+        int numberOfParticles   = 2;
         int numberOfSteps       = (int) 1e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.
         double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
         double timeStep         = 1e-2;
-        bool printToFileOrNot   = false;
+        bool printToFileOrNot   = true;
 
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
@@ -155,6 +163,7 @@ void alphaListRun(double alphaStart, double alphaStop, double alphaStep, bool an
         system->setStepLength               (stepLength);
         system->setAnalytical               (analytic);
         system->setImportanceSampling       (importanceOrNot, timeStep);
+        system->setFileName                 (filename);
         system->runMetropolisSteps          (numberOfSteps, printToFileOrNot, firstCriteria);
             
         alpha -= alphaStep;

@@ -51,6 +51,8 @@ void RandomUniform::setupInitialState() {
         m_particles.at(m3)->setParticleIndex(m3);
     }
 
-    calculateInterparticleDistances();
+    if (m_system->getInteractionOrNot() == true){
+        calculateInterparticleDistances();
+    }
 
 }
