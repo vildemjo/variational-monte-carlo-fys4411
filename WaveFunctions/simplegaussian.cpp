@@ -81,7 +81,7 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     double interactionPart = 0;
 
     if (m_system->getInteractionOrNot() == true){
-        // interactionPart = computeInteractionPartOfDoubleDerivative(particles);
+        interactionPart = computeInteractionPartOfDoubleDerivative(particles);
     }
 
 
@@ -118,4 +118,85 @@ double SimpleGaussian::computeAlphaDerivative(std::vector<class Particle*> parti
 
     return (-1)*vectorSumSquared;
 
+}
+
+
+double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles){
+
+    double firstTerm; double secondTerm; double thirdTerm;
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimentions = m_system->getNumberOfDimensions();
+
+    auto derivativePhi = m_system->getWaveFunction()->computeDerivative(particles);
+
+    double uDerivative = 1;
+    double uDoubleDerivative = 1;
+
+
+    for(int l5 = 0; l5 < numberOfParticles; l5++){
+
+        auto uPart = computeDerivativeOfu(particles, l5);
+
+        for (int l4 = 0; l4<numberOfDimentions; l4++){
+            firstTerm += derivativePhi[l4]*uPart[l4];
+            secondTerm += uPart[l4]*uPart[l4];
+        }
+        thirdTerm += uPart[-1];
+        
+    }
+
+    return 2*firstTerm + secondTerm + thirdTerm;
+}
+
+std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber){
+    
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimentions = m_system->getNumberOfDimensions();
+
+    double uDerivative = 0;
+    double a = m_system->getHardCoreDiameter();
+
+    std::vector <double> uTotalDerivative(numberOfDimentions);
+    double uDoubleDerivative = 0;
+    double uTotalDoubleDerivative = 0;
+
+    std::vector <double> uAllStuff(numberOfDimentions+1);
+
+    auto ri = particles[particleNumber]->getPosition();                              // (x_i, y_i, z_i)
+    auto difference = m_system->getInitialState()->getDistances()[particleNumber];
+
+    for (int l1 = 0; l1 < numberOfParticles; l1++){
+        if (particleNumber != l1){
+            auto rj = particles[l1]->getPosition();                          // (x_j, y_j, z_j)
+            auto rLength = difference[l1];                                   // r_ij
+
+            /* Here sum u'(r_ij) is determined based on the relationship 
+            between r_ij (distance between particles) and a (hard core diameter) */
+
+            if (rLength <= a){
+                uDerivative = -1e20;
+                uDoubleDerivative = -1e20;
+            }else{
+                uDerivative = -a/(a*rLength-rLength*rLength);
+                uDoubleDerivative = a*(a-2*rLength)/(rLength*rLength*(a-rLength)*(a-rLength));
+            }
+
+            for (int l3 = 0; l3<numberOfDimentions; l3++){
+                uTotalDerivative[l3] += ((ri[l3]-rj[l3])/rLength)*uDerivative;
+            }
+
+            uTotalDoubleDerivative += uDoubleDerivative + (2/rLength)*uDerivative;
+
+        }
+    }
+
+    for (int l4 = 0; l4<numberOfDimentions+1; l4++){
+        if(l4<numberOfDimentions){
+            uAllStuff[l4] = uTotalDerivative[l4];
+        }else{
+            uAllStuff[l4] = uTotalDoubleDerivative;
+        }
+    }
+
+    return uAllStuff;
 }
