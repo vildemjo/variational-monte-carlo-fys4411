@@ -7,6 +7,7 @@
 #include "particle.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "WaveFunctions/wavefunction.h"
+#include <string>
 
 using namespace std;
 
@@ -80,15 +81,17 @@ void Sampler::printOutputToFile(){
     ofstream myfile;
     double alpha = m_system->getWaveFunction()->getParameters()[0];
 
+    string filename = "Output/" + m_system->getFileName();
+
     if (m_firstCriteria == 0) { 
         // Setting the correct filename for the different settings
-
-        myfile.open (m_system->getFileName(), ios::out | ios::trunc);
+        
+        myfile.open (filename, ios::out | ios::trunc);
         myfile << "Energy: \t Alpha: \n"; 
         myfile.close(); 
     }
         
-    myfile.open (m_system->getFileName(), ios::out | ios::app);
+    myfile.open (filename, ios::out | ios::app);
         
     myfile << m_energy << "\t" << alpha << "\n";
     myfile.close();

@@ -43,7 +43,7 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
             for (int j2 = j1+1; j2 <numberOfParticles; j2++){
                 auto distances_j1_j2 = distances_j1[j2];
                 if ( distances_j1_j2 <= a ) {
-                    uSum += 1;
+                    uSum += -1e20;
                 }else{
                     uSum += log(1-a/distances_j1_j2);
                 }
@@ -81,30 +81,14 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     double interactionPart = 0;
 
     if (m_system->getInteractionOrNot() == true){
-        interactionPart = computeInteractionPartOfDoubleDerivative(particles);
+        // interactionPart = computeInteractionPartOfDoubleDerivative(particles);
     }
 
 
     return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2) + interactionPart;
 }
 
-double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles){
 
-    double firstTerm; double secondTerm; double thirdTerm;
-    int numberOfParticles = m_system->getNumberOfParticles();
-    int numberOfDimentions = m_system->getNumberOfDimensions();
-
-    auto derivativePhi = computeDerivative(particles);
-    // auto distanceVector = computeInteractingDerivative(particles);
-
-    for (int j5 = 0; j5<numberOfDimentions; j5++){
-        // firstTerm += derivativePhi[j5]*distanceVector[j5];
-    }
-
-    firstTerm = 2;
-
-    return firstTerm + secondTerm + thirdTerm;
-}
 
 std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle*> particles){
     
@@ -120,7 +104,6 @@ std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle
 
     return vectorSum;
 }
-
 
 double SimpleGaussian::computeAlphaDerivative(std::vector<class Particle*> particles){
 

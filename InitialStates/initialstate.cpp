@@ -10,8 +10,9 @@ InitialState::InitialState(System* system) {
 }
 
 void InitialState::calculateInterparticleDistances(){
-    std::vector <std::vector <double>>      distances  (m_numberOfParticles);
-    std::vector <double>                    difference (m_numberOfParticles);
+    std::vector <std::vector <double>>                distances       (m_numberOfParticles); // a matrix of the distance between all particles 
+    std::vector <double>                              difference      (m_numberOfParticles); // the distance between particle j and all other particles i where j>i
+    std::vector <double>                              vectorDistance  (m_numberOfDimensions); 
 
     double a = m_system->getHardCoreDiameter();
     m_system->getHamiltonian()->setInteractionPotential(false);
@@ -21,18 +22,19 @@ void InitialState::calculateInterparticleDistances(){
         for (int j2 = j1+1; j2 <m_numberOfParticles; j2++){
             auto r2 = m_particles[j2]->getPosition();
             for (int j3 = 0; j3<m_numberOfDimensions; j3++){
-                difference[j2] +=  r1[j3]-r2[j3];
+                difference[j2] +=  (r1[j3]-r2[j3])*(r1[j3]-r2[j3]);              // (x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2
             }
-            difference[j2] = sqrt(difference[j2]);
+            difference[j2] = sqrt(difference[j2]);                                  // sqrt((x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2)
+
             if (difference[j2] < a){
                 m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
             }
         }
         distances[j1] = difference;
     }
-
     setDistances(distances);
 }
+
 
 void InitialState::setDistances(std::vector<std::vector<double>> distances){
     m_distances = distances;
@@ -42,8 +44,6 @@ void InitialState::updateDistances(int particleNumber){
     assert(particleNumber < m_numberOfParticles);
     
     std::vector <double> difference(m_numberOfParticles);
-
-
 
     auto r1 = m_particles[particleNumber]->getPosition();
     double a = m_system->getHardCoreDiameter();

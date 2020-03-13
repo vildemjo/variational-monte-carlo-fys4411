@@ -16,7 +16,7 @@ public:
     void setAnalytical              (bool statement);
     void setImportanceSampling      (bool statement, double timeStep);
     void setInteractionOrNot        (bool statement, double hardCoreDiameter);
-    void setFileName                (string filename) {m_filename = filename;}
+    void setFileName                (std::string filename) {m_filename = filename;}
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }
@@ -31,7 +31,7 @@ public:
     double getStepLength()              { return m_stepLength; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
     double getHardCoreDiameter()        { return m_hardCoreDiameter; }
-    string getFileName()                { return m_filename; }
+    std::string getFileName()                { return m_filename; }
     double greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld);
 
 private:
@@ -47,7 +47,7 @@ private:
     double                          m_equilibrationFraction = 0.0;
     double                          m_stepLength = 0.1;
     double                          m_hardCoreDiameter = 0.5;
-    string                          m_filename = "no_name_given.txt";
+    std::string                     m_filename = "no_name_given.txt";
     class WaveFunction*             m_waveFunction = nullptr;
     class Hamiltonian*              m_hamiltonian = nullptr;
     class InitialState*             m_initialState = nullptr;

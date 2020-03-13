@@ -8,5 +8,5 @@ public:
     double computeDoubleDerivative(std::vector<class Particle*> particles);
     std::vector<double> computeDerivative(std::vector<class Particle*> particles);
     double computeAlphaDerivative(std::vector<class Particle*> particles);
-    double computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles);
+    // double computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles);
 };
