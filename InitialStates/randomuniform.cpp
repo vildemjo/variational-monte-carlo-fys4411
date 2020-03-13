@@ -27,32 +27,27 @@ RandomUniform::RandomUniform(System*    system,
 }
 
 void RandomUniform::setupInitialState() {
-    for (int m3=0; m3 < m_numberOfParticles; m3++) {
-        std::vector<double> position = std::vector<double>();
 
-        for (int j=0; j < m_numberOfDimensions; j++) {
-            /* This is where you should actually place the particles in
-             * some positions, according to some rule. Since this class is
-             * called random uniform, they should be placed randomly according
-             * to a uniform distribution here. However, later you will write
-             * more sub-classes of the InitialState class in which the
-             * particles are placed in other configurations.
-             *
-             * Note: For now, the particles are simply placed in positions
-             * according to their index in the particles list (this is
-             * obviously NOT a good idea).
-             */
+    bool positionCheck = false;
+    while ( positionCheck == false){
 
-            position.push_back(m_system->getStepLength()*(Random::nextDouble()-0.5));
+        for (int m3=0; m3 < m_numberOfParticles; m3++) {
+            std::vector<double> position = std::vector<double>();
+        
+            for (int j=0; j < m_numberOfDimensions; j++) {
+
+                position.push_back(m_system->getStepLength()*(Random::nextDouble()-0.5));
+            }
+            
+            m_particles.push_back(new Particle(m_system));
+            m_particles.at(m3)->setNumberOfDimensions(m_numberOfDimensions);
+            m_particles.at(m3)->setPosition(position);
+            m_particles.at(m3)->setParticleIndex(m3);
         }
-        m_particles.push_back(new Particle(m_system));
-        m_particles.at(m3)->setNumberOfDimensions(m_numberOfDimensions);
-        m_particles.at(m3)->setPosition(position);
-        m_particles.at(m3)->setParticleIndex(m3);
-    }
 
-    if (m_system->getInteractionOrNot() == true){
-        calculateInterparticleDistances();
+        if (m_system->getInteractionOrNot() == true){
+            positionCheck = calculateInterparticleDistances();
+        }
     }
 
 }

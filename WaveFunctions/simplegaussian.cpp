@@ -84,26 +84,37 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
         interactionPart = computeInteractionPartOfDoubleDerivative(particles);
     }
 
-
     return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2) + interactionPart;
 }
 
 
-
 std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle*> particles){
     
-    /* */
-    std::vector<double> vectorSum(m_system->getNumberOfDimensions());
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    std::vector<double> vectorSum(numberOfDimensions);
+
+    std::vector <double> vectorWithInteraction(numberOfDimensions);
 
     for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
+        auto uDerivative = computeDerivativeOfu(particles, i8);
         auto r = particles[i8]->getPosition();
-        for (int n8=0; n8<m_system->getNumberOfDimensions(); n8++){
-            vectorSum[n8] += -2*getParameters()[0]*r[n8];
+
+        for (int n8=0; n8<numberOfDimensions; n8++){
+            auto phiPart = -2*getParameters()[0]*r[n8];
+            vectorSum[n8] += phiPart;
+            vectorWithInteraction[n8] += phiPart + uDerivative[n8];
         }
     }
 
-    return vectorSum;
+    if (m_system->getInteractionOrNot() == true){
+        return vectorWithInteraction;
+    }else{
+        return vectorSum;
+    }
+    
 }
+
 
 double SimpleGaussian::computeAlphaDerivative(std::vector<class Particle*> particles){
 
@@ -147,6 +158,7 @@ double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<clas
 
     return 2*firstTerm + secondTerm + thirdTerm;
 }
+
 
 std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber){
     

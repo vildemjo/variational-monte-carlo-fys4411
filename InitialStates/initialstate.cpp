@@ -9,7 +9,7 @@ InitialState::InitialState(System* system) {
     m_system = system;
 }
 
-void InitialState::calculateInterparticleDistances(){
+bool InitialState::calculateInterparticleDistances(){
     std::vector <std::vector <double>>                distances       (m_numberOfParticles); // a matrix of the distance between all particles 
     std::vector <double>                              difference      (m_numberOfParticles); // the distance between particle j and all other particles i where j>i
     std::vector <double>                              vectorDistance  (m_numberOfDimensions); 
@@ -28,11 +28,13 @@ void InitialState::calculateInterparticleDistances(){
 
             if (difference[j2] < a){
                 m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
+                return false;
             }
         }
         distances[j1] = difference;
     }
     setDistances(distances);
+    return true;
 }
 
 

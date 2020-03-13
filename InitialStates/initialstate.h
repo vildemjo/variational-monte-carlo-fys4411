@@ -6,7 +6,7 @@ public:
     InitialState(class System* system);
     virtual void setupInitialState() = 0;
     std::vector<class Particle*> getParticles() { return m_particles; }
-    void calculateInterparticleDistances();
+    bool calculateInterparticleDistances();
     void setDistances(std::vector<std::vector<double>> distances);
     void updateDistances(int particleNumber);
     std::vector<double> evaluateDifferenceVector();
