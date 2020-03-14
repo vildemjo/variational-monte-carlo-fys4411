@@ -4,6 +4,7 @@
 #include "wavefunction.h"
 #include "../particle.h"
 #include "InitialStates/initialstate.h"
+#include <iostream>
 
 SimpleGaussian::SimpleGaussian(System* system, double alpha) :
         WaveFunction(system) {
@@ -17,11 +18,16 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
 
     double rSum = 0.0;
 
-    int numberOfParticles = particles.size();
-    int numberOfDimensions = particles[0]->getPosition().size();
+    // std::cout << "I am inside evaluate wavefunction" << std::endl;
+
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    // std::cout << "there are " << numberOfParticles << " particles in the system" << std::endl;
 
     for(int i1=0; i1<numberOfParticles; i1++){
         auto r = particles[i1]->getPosition();
+        // std::cout << "I can get the position of particle " << i1+1 << std::endl;
         for(int n1=0; n1<numberOfDimensions; n1++){
             rSum += r[n1]*r[n1];
         }
@@ -29,20 +35,41 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
 
     double interactionPart = 1;
 
-   if (m_system->getInteractionOrNot() == true){
+    // std::cout << "test_ok" << std::endl;
+   
+    if (m_system->getInteractionOrNot() == true){
        /* Write a sum over all particles where j<k. Check if r_jk > a. (else: f = 0 and u = ln(f) = 1) 
        then u = ln (1-a/r_jk)*/
-
+        // std::cout << "test_ok2" << std::endl;
         auto a = m_system->getHardCoreDiameter();
         double uSum = 0;
+        std::vector<double> distances_j1(numberOfParticles);
+        std::vector<double> distances_j2(numberOfParticles);
+        double distances_j1_j2;
+
+        // std::cout << "test_ok3" << std::endl;
 
         auto distances = m_system->getInitialState()->getDistances();
 
+        // std::cout << "test_ok4" << std::endl;
+
+        // for (int jjk = 0; jjk < distances.size(); jjk++){
+        //     std::cout << std::endl;
+        //     for (int jjkk = 0; jjkk < distances.size(); jjkk++){
+        //         std::cout << distances[jjkk][jjk];
+        //     }
+        // }
+
         for (int j1 = 0; j1 < numberOfParticles-1; j1++){
-            auto distances_j1 = distances[j1];
+            // std::cout << "test_ok5" << std::endl;
+
+            distances_j1 = distances[j1];
+            // std::cout << "test_ok6" << std::endl;
+
             for (int j2 = j1+1; j2 <numberOfParticles; j2++){
-                auto distances_j1_j2 = distances_j1[j2];
+                distances_j1_j2 = distances_j1[j2];
                 if ( distances_j1_j2 <= a ) {
+                    std::cout << "distance is too small in wave function" << std::endl;
                     uSum += -1e20;
                 }else{
                     uSum += log(1-a/distances_j1_j2);
@@ -50,6 +77,7 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
             }
         }
         interactionPart = exp(uSum);
+        // std::cout << "interaction part is found and is " << exp(uSum) << std::endl;
 
    }
 
@@ -67,10 +95,11 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
      * Schrödinger equation to see how the two are related).
      */
 
-    int numberOfParticles = particles.size();
-    int numberOfDimensions = particles[0]->getPosition().size();
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
 
     double rSum2 = 0.0;
+    double interactionPart = 0;
 
     for(int i2=0; i2<numberOfParticles; i2++){
         auto r = particles[i2]->getPosition();
@@ -78,7 +107,8 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
             rSum2 += r[n2]*r[n2];
         }   
     }
-    double interactionPart = 0;
+    
+    // std::cout << "The double derivative without interaction is okay" << std::endl;
 
     if (m_system->getInteractionOrNot() == true){
         interactionPart = computeInteractionPartOfDoubleDerivative(particles);
@@ -94,24 +124,57 @@ std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle
 
     std::vector<double> vectorSum(numberOfDimensions);
 
-    std::vector <double> vectorWithInteraction(numberOfDimensions);
-
-    for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
-        auto uDerivative = computeDerivativeOfu(particles, i8);
-        auto r = particles[i8]->getPosition();
-
-        for (int n8=0; n8<numberOfDimensions; n8++){
-            auto phiPart = -2*getParameters()[0]*r[n8];
-            vectorSum[n8] += phiPart;
-            vectorWithInteraction[n8] += phiPart + uDerivative[n8];
-        }
-    }
-
     if (m_system->getInteractionOrNot() == true){
+
+        std::vector <double> vectorWithInteraction(numberOfDimensions);
+        
+        for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
+
+            std::cout << "getting into loop works for p " << i8+1 << std::endl;
+
+            auto uDerivative = computeDerivativeOfu(particles, i8);
+
+            std::cout << "computeDerivativeOfu works p is " << i8+1 << std::endl;
+
+            auto r = particles[i8]->getPosition();
+
+            // std::cout << "getting pos works for p " << i8+1 << std::endl;
+
+            for (int n8=0; n8<numberOfDimensions; n8++){
+                double phiPart = -2*getParameters()[0]*r[n8];
+            
+                // std::cout << "getting phiPart works for dim " << n8 << std::endl;
+
+                vectorSum[n8] += phiPart;
+                vectorWithInteraction[n8] += phiPart + uDerivative[n8];
+
+                // std::cout << "getting uDerivative works for dim " << n8 << std::endl;
+            }
+        }
+
         return vectorWithInteraction;
+    
     }else{
+        for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
+
+            // std::cout << "getting into loop works for p " << i8+1 << std::endl;
+
+            auto r = particles[i8]->getPosition();
+
+            // std::cout << "getting pos works for p " << i8+1 << std::endl;
+
+            for (int n8=0; n8<numberOfDimensions; n8++){
+            double phiPart = -2*getParameters()[0]*r[n8];
+            
+            // std::cout << "getting phiPart works for dim " << n8 << std::endl;
+            vectorSum[n8] += phiPart;
+            }
+        }
         return vectorSum;
     }
+
+    
+
     
 }
 
@@ -162,6 +225,8 @@ double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<clas
 
 std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber){
     
+    // std::cout << "calulating derivative of u for p " << particleNumber+1 << std::endl;
+
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimentions = m_system->getNumberOfDimensions();
 
@@ -175,12 +240,22 @@ std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Part
     std::vector <double> uAllStuff(numberOfDimentions+1);
 
     auto ri = particles[particleNumber]->getPosition();                              // (x_i, y_i, z_i)
+    // std::cout << "getting position for p " << particleNumber+1 << std::endl;
     auto difference = m_system->getInitialState()->getDistances()[particleNumber];
+    // std::cout << "getting distances for p " << particleNumber+1 << std::endl;
+
+ 
+    // std::cout << "this is r_ij for p " << particleNumber+1 << std::endl;
+    // std::cout << difference[0] << ",\t" << difference[1] << ",\t" << difference[2] << ",\t" << std::endl;
+    
 
     for (int l1 = 0; l1 < numberOfParticles; l1++){
+        // std::cout << "into loop for r_" << particleNumber << l1 << std::endl;
         if (particleNumber != l1){
             auto rj = particles[l1]->getPosition();                          // (x_j, y_j, z_j)
+            // std::cout << "getting pos for r_" << particleNumber << l1 << std::endl;
             auto rLength = difference[l1];                                   // r_ij
+            // std::cout << "getting |r_" << particleNumber << l1 << "|" << std::endl;
 
             /* Here sum u'(r_ij) is determined based on the relationship 
             between r_ij (distance between particles) and a (hard core diameter) */

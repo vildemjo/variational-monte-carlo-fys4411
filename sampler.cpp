@@ -35,7 +35,11 @@ void Sampler::sample(bool acceptedStep) {
     double localEnergy;
 
     if (m_stepNumber > m_system->getEquilibrationFraction()*m_system->getNumberOfMetropolisSteps()){
+        // std::cout << "We are past the equlibration" << std::endl;
         localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
+
+        // std::cout << localEnergy << std::endl;
+
         m_cumulativeEnergy  += localEnergy;
         m_cumulativeEnergySquared += localEnergy*localEnergy;
         m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());

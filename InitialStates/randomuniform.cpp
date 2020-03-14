@@ -24,6 +24,7 @@ RandomUniform::RandomUniform(System*    system,
     m_system->setNumberOfDimensions(numberOfDimensions);
     m_system->setNumberOfParticles(numberOfParticles);
     setupInitialState();
+    // std::cout << "Done setting up in the class" << std::endl;
 }
 
 void RandomUniform::setupInitialState() {
@@ -38,7 +39,7 @@ void RandomUniform::setupInitialState() {
 
                 position.push_back(m_system->getStepLength()*(Random::nextDouble()-0.5));
             }
-            
+
             m_particles.push_back(new Particle(m_system));
             m_particles.at(m3)->setNumberOfDimensions(m_numberOfDimensions);
             m_particles.at(m3)->setPosition(position);
@@ -47,7 +48,9 @@ void RandomUniform::setupInitialState() {
 
         if (m_system->getInteractionOrNot() == true){
             positionCheck = calculateInterparticleDistances();
+        }else{
+            positionCheck = true;
         }
     }
-
+    // std::cout << "Im out of the while-loop" << std::endl;
 }

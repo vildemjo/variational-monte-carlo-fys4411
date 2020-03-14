@@ -26,7 +26,7 @@ int main() {
     bool analyticOrNot = false;
     bool importanceOrNot = false;
     bool interactionOrNot = true;
-    double hardCoreDiameter = 1.0;
+    double hardCoreDiameter = 0.05;
 
     bool gradientDescent = false;
     double minimizationRate = 0.1;
@@ -34,10 +34,10 @@ int main() {
     double stopCriteria = 1e-9;
 
     bool alphaList = true;
-    double alphaStart = 1.0;
+    double alphaStart = 0.6;
     double alphaStop = 0.1;
     double alphaStep = 0.1;
-    string filename = "WithInt_check_result2_energy_alpha.txt";
+    string filename = "test_energy_alpha.txt";
     
 
     if (gradientDescent == true){
@@ -102,12 +102,12 @@ void gradientDecentRun(string filename,
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
+        system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter); // Must come before initialize state
         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);
         system->setAnalytical               (analyticOrNot);
         system->setImportanceSampling       (importanceOrNot, timeStep);
-        system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter);
         system->runMetropolisSteps          (numberOfSteps, printToFileOrNot, firstCriteria);
     
         firstCriteria = 1;
@@ -147,17 +147,18 @@ void alphaListRun(string filename,
 
         double stopCriteria     = 1e-9;         // Stopping criteria for energy vs exact energy.
         int numberOfDimensions  = 1;
-        int numberOfParticles   = 2;
+        int numberOfParticles   = 3;
         int numberOfSteps       = (int) 5e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.
-        double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
+        double equilibration    = 0.01;          // Fraction of the total steps used for equilibration
         double timeStep         = 1e-2;
-        bool printToFileOrNot   = true;
+        bool printToFileOrNot   = false;
 
         System* system = new System();
         system->setHamiltonian              (new HarmonicOscillator(system, omega));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
+        system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter);
         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
         system->setEquilibrationFraction    (equilibration);
         system->setStepLength               (stepLength);

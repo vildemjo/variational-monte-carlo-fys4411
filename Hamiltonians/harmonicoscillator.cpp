@@ -15,15 +15,6 @@ HarmonicOscillator::HarmonicOscillator(System* system, double omega) :
 }
 
 double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) {
-    /* Here, you need to compute the kinetic and potential energies. Note that
-     * when using numerical differentiation, the computation of the kinetic
-     * energy becomes the same for all Hamiltonians, and thus the code for
-     * doing this should be moved up to the super-class, Hamiltonian.
-     *
-     * You may access the wave function currently used through the
-     * getWaveFunction method in the m_system object in the super-class, i.e.
-     * m_system->getWaveFunction()...
-     */
 
     double hbar = 1.0;
     double m = 1.0;
@@ -41,17 +32,22 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     double doubleDerivative;
 
+    // std::cout << "evaluating rSum is ok" << std::endl;
+
     double potentialEnergy = 0.5*m*m_omega*rSum2;
 
     // Calculating the normalized second derivative either analytically or numerically
     if (m_system->getAnalytical() == true){
         doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+        // std::cout << "the double derivative is okay" << std::endl;
         }
     else{
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
     double kineticEnergy   = (-hbar*hbar/(2*m))*doubleDerivative;
     
+
+    // std::cout << "no interaction energy calculation works" << std::endl;
     double interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
 
     return kineticEnergy + potentialEnergy + interactionEnergy;
@@ -60,9 +56,12 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Particle*> particles){
 
     /* Should maybe add the possibility of choosing nummerical derivative? */
-
+    // std::cout << "into quantum F ok" << std::endl;
+    /* computeDerivative checks if there is interaction or not and returns the relevant derivative */
     auto derivative = m_system->getWaveFunction()->computeDerivative(particles);
 
+    // std::cout << "computeDerivative works" << std::endl;
+    /* The quantum force is given by 2*psi_T^-1 derivative(psi_T) */ 
     for (int m=0;m<m_system->getNumberOfDimensions();m++){
         derivative[m] *= 2;
     }
