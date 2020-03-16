@@ -53,8 +53,9 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
 }
 
 void Hamiltonian::setInteractionPotential(bool statement){
+    m_interactionPotential = 0;
     if (statement == true){
-        m_interactionPotential = 1e20;
+        m_interactionPotential = 1;  // Should be infinite. 1 is to be able to check that the situations with r_ij < a are not accepted
     }else{
         m_interactionPotential = 0;
     }

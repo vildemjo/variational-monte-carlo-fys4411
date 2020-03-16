@@ -34,7 +34,7 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     // std::cout << "evaluating rSum is ok" << std::endl;
 
-    double potentialEnergy = 0.5*m*m_omega*rSum2;
+    double potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
     // Calculating the normalized second derivative either analytically or numerically
     if (m_system->getAnalytical() == true){
@@ -47,8 +47,14 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     double kineticEnergy   = (-hbar*hbar/(2*m))*doubleDerivative;
     
 
-    // std::cout << "no interaction energy calculation works" << std::endl;
+    // THis should now not be neccecary because the steps where the Interaction potential
+    // is > 0, should not be accepted
+
     double interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
+
+    if (interactionEnergy > 0){
+        std::cout << "interaction energy above zero: "<< interactionEnergy << std::endl;
+    }
 
     return kineticEnergy + potentialEnergy + interactionEnergy;
 }

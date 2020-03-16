@@ -38,47 +38,37 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
     // std::cout << "test_ok" << std::endl;
    
     if (m_system->getInteractionOrNot() == true){
-       /* Write a sum over all particles where j<k. Check if r_jk > a. (else: f = 0 and u = ln(f) = 1) 
-       then u = ln (1-a/r_jk)*/
-        // std::cout << "test_ok2" << std::endl;
+
         auto a = m_system->getHardCoreDiameter();
         double uSum = 0;
+        int uSumCheck = 0;
         std::vector<double> distances_j1(numberOfParticles);
         std::vector<double> distances_j2(numberOfParticles);
         double distances_j1_j2;
 
-        // std::cout << "test_ok3" << std::endl;
-
         auto distances = m_system->getInitialState()->getDistances();
 
-        // std::cout << "test_ok4" << std::endl;
-
-        // for (int jjk = 0; jjk < distances.size(); jjk++){
-        //     std::cout << std::endl;
-        //     for (int jjkk = 0; jjkk < distances.size(); jjkk++){
-        //         std::cout << distances[jjkk][jjk];
-        //     }
-        // }
 
         for (int j1 = 0; j1 < numberOfParticles-1; j1++){
-            // std::cout << "test_ok5" << std::endl;
 
             distances_j1 = distances[j1];
-            // std::cout << "test_ok6" << std::endl;
 
             for (int j2 = j1+1; j2 <numberOfParticles; j2++){
                 distances_j1_j2 = distances_j1[j2];
                 if ( distances_j1_j2 <= a ) {
-                    std::cout << "distance is too small in wave function" << std::endl;
-                    uSum += -1e20;
+                    uSumCheck += 1;
                 }else{
                     uSum += log(1-a/distances_j1_j2);
                 }
             }
         }
-        interactionPart = exp(uSum);
-        // std::cout << "interaction part is found and is " << exp(uSum) << std::endl;
-
+        // Here the interaction part is set to zero directly (instead of exp(-infty))¨
+        // if one of the distances are less than a
+        if (uSumCheck > 0){
+            interactionPart = 0;
+        }else{
+            interactionPart = exp(uSum);
+        }
    }
 
     return exp(-m_parameters[0]*rSum)*interactionPart;
@@ -130,11 +120,11 @@ std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle
         
         for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
 
-            std::cout << "getting into loop works for p " << i8+1 << std::endl;
+            // std::cout << "getting into loop works for p " << i8+1 << std::endl;
 
             auto uDerivative = computeDerivativeOfu(particles, i8);
 
-            std::cout << "computeDerivativeOfu works p is " << i8+1 << std::endl;
+            // std::cout << "computeDerivativeOfu works p is " << i8+1 << std::endl;
 
             auto r = particles[i8]->getPosition();
 
@@ -201,15 +191,15 @@ double SimpleGaussian::computeInteractionPartOfDoubleDerivative(std::vector<clas
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimentions = m_system->getNumberOfDimensions();
 
-    auto derivativePhi = m_system->getWaveFunction()->computeDerivative(particles);
-
     double uDerivative = 1;
     double uDoubleDerivative = 1;
 
 
-    for(int l5 = 0; l5 < numberOfParticles; l5++){
+    // Here we are summing over all the particles, to get the total 
+    for(int l5 = 0; l5 < numberOfParticles; l5++){ 
 
         auto uPart = computeDerivativeOfu(particles, l5);
+        auto derivativePhi = computeDerivativeOneParticle(particles, l5);
 
         for (int l4 = 0; l4<numberOfDimentions; l4++){
             firstTerm += derivativePhi[l4]*uPart[l4];
@@ -261,8 +251,9 @@ std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Part
             between r_ij (distance between particles) and a (hard core diameter) */
 
             if (rLength <= a){
-                uDerivative = -1e20;
-                uDoubleDerivative = -1e20;
+                uDerivative = -1e50;
+                uDoubleDerivative = -1e50;
+                std::cout << "r_ij < a in computeDerivativeOfu" << std::endl;
             }else{
                 uDerivative = -a/(a*rLength-rLength*rLength);
                 uDoubleDerivative = a*(a-2*rLength)/(rLength*rLength*(a-rLength)*(a-rLength));
@@ -286,4 +277,20 @@ std::vector <double> SimpleGaussian::computeDerivativeOfu(std::vector<class Part
     }
 
     return uAllStuff;
+}
+
+std::vector<double> SimpleGaussian::computeDerivativeOneParticle(std::vector<class Particle*> particles, int particleIndex){
+    
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    std::vector<double> derivativeVector(numberOfDimensions);
+
+    auto r = particles[particleIndex]->getPosition();
+
+    for (int n3=0; n3<numberOfDimensions; n3++){
+        derivativeVector[n3] = -2*getParameters()[0]*r[n3];
+    }
+
+    return derivativeVector;
+    
 }

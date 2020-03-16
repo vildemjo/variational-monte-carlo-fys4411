@@ -13,6 +13,6 @@ public:
 
 protected:
     class System* m_system = nullptr;
-    double m_interactionPotential = 0;
+    int m_interactionPotential = 0;
 };
 

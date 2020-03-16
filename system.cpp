@@ -47,7 +47,7 @@ bool System::metropolisStep() {
         for(int m2=0;m2<m_numberOfDimensions; m2++){
             m_particles[randomParticleIndex]->adjustPosition(-randomAmount[m2], m2);
         }
-
+        // std::cout << "the step was not accepted" << std::endl;
         // The step was not accepted and not be counted
         return false;
     }

@@ -14,6 +14,7 @@ public:
     virtual double computeAlphaDerivative(std::vector<class Particle*> particles) = 0;
     virtual double computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles) = 0;
     virtual std::vector <double> computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber) = 0;
+    virtual std::vector <double> computeDerivativeOneParticle(std::vector<class Particle*> particles, int particleIndex) = 0;
     
 protected:
     int     m_numberOfParameters = 0;

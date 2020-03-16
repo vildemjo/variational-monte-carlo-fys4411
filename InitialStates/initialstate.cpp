@@ -17,6 +17,7 @@ bool InitialState::calculateInterparticleDistances(){
 
     double a = m_system->getHardCoreDiameter();
     m_system->getHamiltonian()->setInteractionPotential(false);
+    int distanceCheck = 0;
 
     for (int j1 = 0; j1 < m_numberOfParticles; j1++){
         // std::cout << "entering loop. Particle 1 is " << j1 << std::endl;
@@ -38,8 +39,7 @@ bool InitialState::calculateInterparticleDistances(){
 
                 if (difference[j2] < a){
                     // std::cout << "too small difference" << std::endl;
-                    m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
-                    return false;
+                    distanceCheck +=1;
                 }
             }
         }
@@ -51,6 +51,11 @@ bool InitialState::calculateInterparticleDistances(){
 
     }
     setDistances(distances);
+
+    if (distanceCheck > 0){
+        m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
+        return false;
+    }
     // std::cout << "have set the distances" << std::endl;
     return true;
 }
@@ -65,6 +70,7 @@ void InitialState::setDistances(std::vector<std::vector<double>> distances){
 void InitialState::updateDistances(int particleNumber){
     
     bool checkDistance = calculateInterparticleDistances();
+    // std::cout << "the distance is " << m_distances[0][0] << " for particle " << particleNumber+1 << std::endl; 
     if (checkDistance == false){
         // std::cout << "the distance got to small during stepping" << std::endl;
     }

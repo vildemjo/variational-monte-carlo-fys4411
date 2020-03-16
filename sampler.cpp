@@ -31,6 +31,7 @@ void Sampler::sample(bool acceptedStep) {
     /* Here you should sample all the interesting things you want to measure.
      * Note that there are (way) more than the single one here currently.
      */
+    
     // Sampling if the equilibrium stage is passed
     double localEnergy;
 
