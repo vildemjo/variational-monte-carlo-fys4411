@@ -89,7 +89,6 @@ void Sampler::printOutputToFile(){
     string filename = "Output/" + m_system->getFileName();
 
     if (m_firstCriteria == 0) { 
-        // Setting the correct filename for the different settings
         
         myfile.open (filename, ios::out | ios::trunc);
         myfile << "Energy: \t Alpha: \n"; 

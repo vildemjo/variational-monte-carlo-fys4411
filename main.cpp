@@ -34,10 +34,10 @@ int main() {
     double stopCriteria = 1e-9;
 
     bool alphaList = true;
-    double alphaStart = 0.8;
+    double alphaStart = 0.6;
     double alphaStop = 0.01;
     double alphaStep = 0.02;
-    string filename = "exercise_b_MC6/ana_3d_5p_test_energy_alpha.txt";
+    string filename = "exercise_b_MC6/ana_1d_2p_new_energy_alpha.txt";
 
     // elliptical or spherical trap (2.82843 or 1.0)
     double beta = 1.0;//2.82843;    // omega_normal^2/omega_ho^2
@@ -92,7 +92,7 @@ void gradientDecentRun(string filename,
     for (int k=0;  energyChange > m_stopCriteria; k++){
 
         int numberOfDimensions  = 1;
-        int numberOfParticles   = 1;
+        int numberOfParticles   = 2;
         int numberOfSteps       = (int) 1e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.
@@ -150,8 +150,8 @@ void alphaListRun(string filename,
     for(int a=0; alpha > alphaStop+alphaStep; a++){
 
         double stopCriteria     = 1e-9;         // Stopping criteria for energy vs exact energy.
-        int numberOfDimensions  = 3;
-        int numberOfParticles   = 5;
+        int numberOfDimensions  = 1;
+        int numberOfParticles   = 2;
         int numberOfSteps       = (int) 1e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.

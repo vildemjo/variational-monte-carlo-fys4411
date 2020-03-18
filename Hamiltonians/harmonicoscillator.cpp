@@ -21,49 +21,82 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     double m = 1.0;
 
     double rSum2 = 0.0;
+    double doubleDerivative = 0.0;
 
-    std::vector<double> r = std::vector<double>();
-    
-    for(int i2=0; i2<m_system->getNumberOfParticles(); i2++){
-        r = particles[i2]->getPosition();
-        for(int n2=0; n2<m_system->getNumberOfDimensions(); n2++){
-            if (n2 == 2){
-                rSum2 += m_beta*r[n2]*r[n2];
+    double kineticEnergy;
+    double potentialEnergy;
+
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    double beta = m_system->getHamiltonian()->getBeta();
+
+    std::vector <double> particlePosition(numberOfDimensions);
+
+    for (int p1 = 0; p1 < numberOfParticles; p1++){
+        particlePosition = particles[p1]->getPosition();
+
+        for (int p2 = 0; p2 < numberOfDimensions; p2++){
+            if (p2 == 2){
+                rSum2 += beta*particlePosition[p2]*particlePosition[p2];
             }else{
-                rSum2 += r[n2]*r[n2];
+                rSum2 += particlePosition[p2]*particlePosition[p2];
             }
         }
     }
 
-    double doubleDerivative;
+    potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
-    // std::cout << "evaluating rSum is ok" << std::endl;
-
-    double potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
-
-    // Calculating the normalized second derivative either analytically or numerically
     if (m_system->getAnalytical() == true){
         doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
-        // std::cout << "the double derivative is okay" << std::endl;
-        }
-    else{
+    }else{
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
-    double kineticEnergy   = (-hbar*hbar/(2.0*m))*doubleDerivative;
+
+    kineticEnergy = -0.5*(hbar*hbar/m)*doubleDerivative;
+
+    // std::vector<double> r = std::vector<double>();
     
-    double interactionEnergy = 0;
+    // for(int i2=0; i2<m_system->getNumberOfParticles(); i2++){
+    //     r = particles[i2]->getPosition();
+    //     for(int n2=0; n2<m_system->getNumberOfDimensions(); n2++){
+    //         if (n2 == 2){
+    //             rSum2 += m_beta*r[n2]*r[n2];
+    //         }else{
+    //             rSum2 += r[n2]*r[n2];
+    //         }
+    //     }
+    // }
 
-    // THis should now not be neccecary because the steps where the Interaction potential
-    // is > 0, should not be accepted
-    if (m_system->getInteractionOrNot() == true){
-        interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
+    // double doubleDerivative;
 
-        if (interactionEnergy > 0){
-            std::cout << "interaction energy above zero: "<< interactionEnergy << std::endl;
-        }
-    }
+    // // std::cout << "evaluating rSum is ok" << std::endl;
 
-    return kineticEnergy + potentialEnergy + interactionEnergy;
+    // double potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
+
+    // // Calculating the normalized second derivative either analytically or numerically
+    // if (m_system->getAnalytical() == true){
+    //     doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+    //     // std::cout << "the double derivative is okay" << std::endl;
+    //     }
+    // else{
+    //     doubleDerivative = computeDoubleDerivativeNumerically(particles);
+    // }
+    // double kineticEnergy   = (-hbar*hbar/(2.0*m))*doubleDerivative;
+    
+    // double interactionEnergy = 0;
+
+    // // This should now not be neccecary because the steps where the Interaction potential
+    // // is > 0, should not be accepted
+    // if (m_system->getInteractionOrNot() == true){
+    //     interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
+
+    //     if (interactionEnergy > 0){
+    //         std::cout << "interaction energy above zero: "<< interactionEnergy << std::endl;
+    //     }
+    // }
+
+    return kineticEnergy + potentialEnergy; //+ interactionEnergy;
 }
 
 std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Particle*> particles){
