@@ -14,8 +14,8 @@
 
 using namespace std;
 
-void gradientDecentRun(string filename, double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter);
-void alphaListRun(string filename, double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter);
+void gradientDecentRun(string filename, double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter, double beta);
+void alphaListRun(string filename, double alphaStart, double alphaStop, double alphaStep, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter, double beta);
 
 int main() {
 
@@ -34,19 +34,19 @@ int main() {
     double stopCriteria = 1e-9;
 
     bool alphaList = true;
-    double alphaStart = 0.3;
+    double alphaStart = 0.8;
     double alphaStop = 0.01;
     double alphaStep = 0.02;
-    string filename = "with_int/num_2p_1d_a_0-0043_energy_alpha.txt";
+    string filename = "exercise_b_MC6/ana_3d_5p_test_energy_alpha.txt";
 
-    // elliptical or not
-    double beta = 2.82843;    
+    // elliptical or spherical trap (2.82843 or 1.0)
+    double beta = 1.0;//2.82843;    // omega_normal^2/omega_ho^2
 
     if (gradientDescent == true){
-        gradientDecentRun(filename, alphaGuess, minimizationRate, stopCriteria, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter);
+        gradientDecentRun(filename, alphaGuess, minimizationRate, stopCriteria, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter, beta);
     }
     if(alphaList == true){
-        alphaListRun(filename, alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter);
+        alphaListRun(filename, alphaStart, alphaStop, alphaStep, analyticOrNot, importanceOrNot, interactionOrNot, hardCoreDiameter, beta);
     }
 
     end = clock(); 
@@ -67,7 +67,8 @@ void gradientDecentRun(string filename,
                     bool analyticOrNot, 
                     bool importanceOrNot, 
                     bool interactionOrNot, 
-                    double hardCoreDiameter){
+                    double hardCoreDiameter, 
+                    double beta){
 
     int firstCriteria               = 0;                  // Criteria to print header in outputfile
 
@@ -102,7 +103,7 @@ void gradientDecentRun(string filename,
     
 
         System* system = new System();
-        system->setHamiltonian              (new HarmonicOscillator(system, omega));
+        system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
         system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter); // Must come before initialize state
         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
@@ -140,7 +141,8 @@ void alphaListRun(string filename,
                 bool analytic, 
                 bool importanceOrNot,
                 bool interactionOrNot, 
-                double hardCoreDiameter){
+                double hardCoreDiameter,
+                double beta){
 
     int firstCriteria = 0;                  // Criteria to print header in outputfile
 
@@ -148,17 +150,17 @@ void alphaListRun(string filename,
     for(int a=0; alpha > alphaStop+alphaStep; a++){
 
         double stopCriteria     = 1e-9;         // Stopping criteria for energy vs exact energy.
-        int numberOfDimensions  = 1;
-        int numberOfParticles   = 10;
+        int numberOfDimensions  = 3;
+        int numberOfParticles   = 5;
         int numberOfSteps       = (int) 1e6;
         double omega            = 1.0;          // Oscillator frequency.
         double stepLength       = 0.5;          // Metropolis step length.
-        double equilibration    = 0.01;          // Fraction of the total steps used for equilibration
+        double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
         double timeStep         = 1e-2;
         bool printToFileOrNot   = true;
 
         System* system = new System();
-        system->setHamiltonian              (new HarmonicOscillator(system, omega));
+        system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
         system->setInteractionOrNot         (interactionOrNot, hardCoreDiameter);
         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));

@@ -8,10 +8,11 @@
 using std::cout;
 using std::endl;
 
-HarmonicOscillator::HarmonicOscillator(System* system, double omega) :
+HarmonicOscillator::HarmonicOscillator(System* system, double omega, double beta) :
         Hamiltonian(system) {
     assert(omega > 0);
     m_omega  = omega;
+    m_beta   = beta;
 }
 
 double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) {
@@ -26,7 +27,11 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     for(int i2=0; i2<m_system->getNumberOfParticles(); i2++){
         r = particles[i2]->getPosition();
         for(int n2=0; n2<m_system->getNumberOfDimensions(); n2++){
-            rSum2 += r[n2]*r[n2];
+            if (n2 == 2){
+                rSum2 += m_beta*r[n2]*r[n2];
+            }else{
+                rSum2 += r[n2]*r[n2];
+            }
         }
     }
 
@@ -44,16 +49,18 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     else{
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
-    double kineticEnergy   = (-hbar*hbar/(2*m))*doubleDerivative;
+    double kineticEnergy   = (-hbar*hbar/(2.0*m))*doubleDerivative;
     
+    double interactionEnergy = 0;
 
     // THis should now not be neccecary because the steps where the Interaction potential
     // is > 0, should not be accepted
+    if (m_system->getInteractionOrNot() == true){
+        interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
 
-    double interactionEnergy = m_system->getHamiltonian()->getInteractionPotential();
-
-    if (interactionEnergy > 0){
-        std::cout << "interaction energy above zero: "<< interactionEnergy << std::endl;
+        if (interactionEnergy > 0){
+            std::cout << "interaction energy above zero: "<< interactionEnergy << std::endl;
+        }
     }
 
     return kineticEnergy + potentialEnergy + interactionEnergy;

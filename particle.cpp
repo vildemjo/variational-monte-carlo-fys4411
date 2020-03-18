@@ -15,7 +15,7 @@ void Particle::setPosition(const std::vector<double> &position) {
 void Particle::adjustPosition(double change, int dimension) {
     m_position.at(dimension) += change;
     if (m_system->getInteractionOrNot() == true){
-        m_system->getInitialState()->updateDistances(m_particleIndex);
+        m_system->getInitialState()->calculateInterparticleDistances();
     }
 }
 
