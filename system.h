@@ -5,7 +5,9 @@
 class System {
 public:
     bool metropolisStep             ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps, bool statement, int firstCriteria);
+    bool metropolisStepImportance   ();
+    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria);
+    void runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria);
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
     void setStepLength              (double stepLength);
@@ -40,7 +42,6 @@ private:
     int                             m_numberOfMetropolisSteps = 0;
     bool                            m_analytical = false;
     bool                            m_importanceSampling = false;
-    bool                            m_printToFileOrNot = false;
     bool                            m_interactionOrNot = false;
     double                          m_diffConstant = 0.5;
     double                          m_timeStep = 0;

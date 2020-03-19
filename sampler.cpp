@@ -35,16 +35,12 @@ void Sampler::sample(bool acceptedStep) {
     // Sampling if the equilibrium stage is passed
     double localEnergy;
 
-    if (m_stepNumber > m_system->getEquilibrationFraction()*m_system->getNumberOfMetropolisSteps()){
-        // std::cout << "We are past the equlibration" << std::endl;
+    if (m_stepNumber > m_system->getEquilibrationFraction()*m_numberOfMetropolisSteps){
         localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
-
-        // std::cout << localEnergy << std::endl;
-
+        
         m_cumulativeEnergy  += localEnergy;
         m_cumulativeEnergySquared += localEnergy*localEnergy;
         m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
-        //m_cumulativeEnergyDerivative += m_system->getHamiltonian()->computeEnergyDerivative(m_system->getParticles());
         m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
 
     }
@@ -81,23 +77,37 @@ void Sampler::printOutputToTerminal() {
     cout << endl;
 }
 
-void Sampler::printOutputToFile(){
+void Sampler::printOutputToEnergyAlphaFile(){
     
+    int     np = m_system->getNumberOfParticles();
+    int     nd = m_system->getNumberOfDimensions();
+    int     ms = m_system->getNumberOfMetropolisSteps();
+    int     p  = m_system->getWaveFunction()->getNumberOfParameters();
+    double  ef = m_system->getEquilibrationFraction();
+
     ofstream myfile;
     double alpha = m_system->getWaveFunction()->getParameters()[0];
 
-    string filename = "Output/" + m_system->getFileName();
+    string filename = "Output/" + m_system->getFileName() + "_energy_alpha.txt";
 
     if (m_firstCriteria == 0) { 
         
         myfile.open (filename, ios::out | ios::trunc);
-        myfile << "Energy: \t Alpha: \n"; 
+        myfile << "  -- System info -- " << endl;
+        myfile << " Number of particles  : " << np << endl;
+        myfile << " Number of dimensions : " << nd << endl;
+        myfile << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
+        myfile << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
+        myfile << " Beta: " << m_system->getHamiltonian()->getBeta() << endl;
+        myfile << " Step length (importance sampling): " << m_system->getStepLength() << endl;
+        myfile << "===================================================" << endl;
+        myfile << "Energy: \t Alpha: \t Acceptance [%]: \n"; 
         myfile.close(); 
     }
         
     myfile.open (filename, ios::out | ios::app);
         
-    myfile << m_energy << "\t" << alpha << "\n";
+    myfile << m_energy << "\t" << alpha << 100*m_numberOfAcceptedSteps/m_numberOfMetropolisSteps <<"\n";
     myfile.close();
 }
 
@@ -106,17 +116,20 @@ void Sampler::computeAverages() {
      * thoroughly through what is written here currently; is this correct?
      * Take away the non-physical stuff before eqilibrium - so not all steps
      */
+    evaluateNumberOfCyclesIncluded();
 
-    int numberOfCyclesIncluded = (m_system->getNumberOfMetropolisSteps()*
-                                    (1-m_system->getEquilibrationFraction()));
-
-    m_energy = m_cumulativeEnergy / numberOfCyclesIncluded;
-    m_energySquared = m_cumulativeEnergySquared / numberOfCyclesIncluded;
-    m_derivative = 2*m_cumulativeEnergyDerivative / numberOfCyclesIncluded
-                    - 2*(m_cumulativeAlphaDerivative / numberOfCyclesIncluded)*m_energy;
+    m_energy = m_cumulativeEnergy / m_numberOfCyclesIncluded;
+    m_energySquared = m_cumulativeEnergySquared / m_numberOfCyclesIncluded;
+    m_derivative = 2*m_cumulativeEnergyDerivative / m_numberOfCyclesIncluded
+                    - 2*(m_cumulativeAlphaDerivative / m_numberOfCyclesIncluded)*m_energy;
 }
 
 void Sampler::setFileOutput(int firstCriteria){
     m_firstCriteria = firstCriteria;
     // m_filename = filename;
+}
+
+void Sampler::evaluateNumberOfCyclesIncluded(){
+    m_numberOfCyclesIncluded = (m_numberOfMetropolisSteps*
+                                    (1-m_system->getEquilibrationFraction()));
 }
