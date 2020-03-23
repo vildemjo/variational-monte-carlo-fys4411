@@ -5,11 +5,13 @@ public:
     Sampler(class System* system);
     void setNumberOfMetropolisSteps(int steps);
     void sample(bool acceptedStep);
+    void sampleAllEnergies(bool acceptedStep);
     void printOutputToTerminal();
     void printOutputToEnergyAlphaFile();
     void setFileOutput(int firstCriteria);
     void computeAverages();
     void evaluateNumberOfCyclesIncluded();
+    void printOutputToEnergyFile();
     double getEnergy()          { return m_energy; }
     double getDerivative()      { return m_derivative; }
     double getAcceptance()      { return 100*m_numberOfAcceptedSteps/m_numberOfMetropolisSteps; }
@@ -27,7 +29,7 @@ private:
     int     m_numberOfAcceptedSteps = 0;
     int     m_numberOfCyclesIncluded = 0;
     int     m_firstCriteria = 1;
-    // string  m_filename;
+    std::vector <double> m_localEnergyVector = std::vector <double>();
     bool    m_printOrNot;
     class System* m_system = nullptr;
 };

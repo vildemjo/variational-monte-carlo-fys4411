@@ -8,6 +8,7 @@
 #include "Hamiltonians/hamiltonian.h"
 #include "WaveFunctions/wavefunction.h"
 #include <string>
+#include <omp.h>
 
 using namespace std;
 
@@ -37,15 +38,43 @@ void Sampler::sample(bool acceptedStep) {
 
     if (m_stepNumber > m_system->getEquilibrationFraction()*m_numberOfMetropolisSteps){
         localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
-        
         m_cumulativeEnergy  += localEnergy;
         m_cumulativeEnergySquared += localEnergy*localEnergy;
         m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
         m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
-
     }
 
     m_stepNumber++;
+}
+
+void Sampler::sampleAllEnergies(bool acceptedStep) {
+    // Make sure the sampling variable(s) are initialized at the first step.
+    if (m_stepNumber == 0) {
+        m_cumulativeEnergy = 0;
+    }
+    if (acceptedStep == 1) { m_numberOfAcceptedSteps += 1; }
+
+    /* Here you should sample all the interesting things you want to measure.
+     * Note that there are (way) more than the single one here currently.
+     */
+    
+    // Sampling if the equilibrium stage is passed
+        double localEnergy;
+
+
+        if (m_stepNumber >= m_system->getEquilibrationFraction()*m_numberOfMetropolisSteps){
+            localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
+            
+            m_cumulativeEnergy  += localEnergy;
+            m_cumulativeEnergySquared += localEnergy*localEnergy;
+            m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+            m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+            // cout << m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles()) << endl;
+            m_localEnergyVector.push_back(localEnergy);
+        }
+
+        m_stepNumber++;
+    
 }
 
 void Sampler::printOutputToTerminal() {
@@ -101,13 +130,37 @@ void Sampler::printOutputToEnergyAlphaFile(){
         myfile << " Beta: " << m_system->getHamiltonian()->getBeta() << endl;
         myfile << " Step length (importance sampling): " << m_system->getStepLength() << endl;
         myfile << "===================================================" << endl;
-        myfile << "Energy: \t Alpha: \t Acceptance [%]: \n"; 
+        myfile << "Energy: \t Alpha: \t Acceptance: \n"; 
+        myfile << m_energy << "\t" << alpha << "\t" << 100.0*(double)m_numberOfAcceptedSteps/(double)m_numberOfMetropolisSteps <<"\n";
         myfile.close(); 
-    }
-        
+    }else{
+        // std::cout << "printing" << std::endl;
     myfile.open (filename, ios::out | ios::app);
         
-    myfile << m_energy << "\t" << alpha << 100*m_numberOfAcceptedSteps/m_numberOfMetropolisSteps <<"\n";
+    myfile << m_energy << "\t" << alpha << "\t" << 100.0*(double)m_numberOfAcceptedSteps/(double)m_numberOfMetropolisSteps <<"\n";
+    myfile.close();
+    std::cout << m_energy << "\t" << alpha <<"\n";
+    }
+}
+
+void Sampler::printOutputToEnergyFile(){
+
+    ofstream myfile;
+    // to_string(omp_get_thread_num())
+
+    std::cout << "accepted steps: " << m_numberOfAcceptedSteps << endl;
+
+    // std::cout << omp_get_thread_num() << " about to print" << endl;
+
+    cout << "Length of energy vector: " << m_localEnergyVector.size() << endl;
+
+    string filename = m_system->getFileName() + "_energy.txt";
+
+    myfile.open (filename, ios::out | ios::trunc);
+
+    for (int n3 = 0; n3<m_localEnergyVector.size(); n3++){
+        myfile << m_localEnergyVector[n3] <<"\n";
+    }
     myfile.close();
 }
 
@@ -116,12 +169,15 @@ void Sampler::computeAverages() {
      * thoroughly through what is written here currently; is this correct?
      * Take away the non-physical stuff before eqilibrium - so not all steps
      */
+
     evaluateNumberOfCyclesIncluded();
+
+    // cout << "number of cycles: " << m_numberOfCyclesIncluded << endl;
 
     m_energy = m_cumulativeEnergy / m_numberOfCyclesIncluded;
     m_energySquared = m_cumulativeEnergySquared / m_numberOfCyclesIncluded;
-    m_derivative = 2*m_cumulativeEnergyDerivative / m_numberOfCyclesIncluded
-                    - 2*(m_cumulativeAlphaDerivative / m_numberOfCyclesIncluded)*m_energy;
+    m_derivative = 2* m_cumulativeEnergyDerivative / (double) m_numberOfCyclesIncluded
+                    - 2*(m_cumulativeAlphaDerivative / (double) m_numberOfCyclesIncluded)*m_energy;
 }
 
 void Sampler::setFileOutput(int firstCriteria){
@@ -130,6 +186,6 @@ void Sampler::setFileOutput(int firstCriteria){
 }
 
 void Sampler::evaluateNumberOfCyclesIncluded(){
-    m_numberOfCyclesIncluded = (m_numberOfMetropolisSteps*
-                                    (1-m_system->getEquilibrationFraction()));
+    m_numberOfCyclesIncluded = ( m_numberOfMetropolisSteps*
+                                    (1.0-m_system->getEquilibrationFraction()));
 }

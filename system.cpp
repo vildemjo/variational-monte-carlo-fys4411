@@ -9,6 +9,7 @@
 #include "Math/random.h"
 #include <string>
 #include <iostream>
+#include <omp.h>
 
 using namespace std;
 
@@ -16,10 +17,6 @@ bool System::metropolisStep() {
     
     // Evaluating the wave function for the present positions
     double oldWaveFunction = m_waveFunction->evaluate(m_particles);
-    
-    /* Here the type of sampling is checked 
-    (Options: Brute Force Monte Carlo or Importance Sampling) */
-    
         
     std::vector<double> randomAmount = std::vector<double>();  // The distance the particle is moved in each direction
 
@@ -44,9 +41,10 @@ bool System::metropolisStep() {
 
     // Move the particle back to it's original position if not accepted
     for(int m2=0;m2<m_numberOfDimensions; m2++){
+        // std::cout << "adjusting position" << std::endl;
         m_particles[randomParticleIndex]->adjustPosition(-randomAmount[m2], m2);
     }
-    // std::cout << "the step was not accepted" << std::endl;
+    // std::cout << "the step was not accepted by thread "<< omp_get_thread_num() << std::endl;
     // The step was not accepted and not be counted
     return false;
 
@@ -106,17 +104,22 @@ bool System::metropolisStepImportance() {
 
 }
 
-void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria) {
-    m_particles                 = m_initialState->getParticles();
-    m_sampler                   = new Sampler(this);
-    m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
-    m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
-    m_sampler->setFileOutput(firstCriteria);
+void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, double stepLength) {
+    m_particles                             = m_initialState->getParticles();
+    m_sampler                               = new Sampler(this);
+    m_numberOfMetropolisSteps               = numberOfMetropolisSteps;
+    m_stepLength                            = stepLength;
+    m_sampler->setNumberOfMetropolisSteps   (numberOfMetropolisSteps);
+    m_sampler->setFileOutput                (firstCriteria);
 
+
+    int i;
     // std::cout << "finished setting up" << std::endl;
-
-    for (int i=0; i < numberOfMetropolisSteps; i++) {
+    // #pragma omp parallel for default(shared) private(i)
+    for (i=0; i < numberOfMetropolisSteps; i++) {
         
+        
+        // std::cout << "master at step numb " << i << endl;
         // Counting the number of steps that are accepted by checking if it was accepted
 
         bool acceptedStep = metropolisStep();
@@ -127,25 +130,30 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria) 
         * for a while. You may handle this using the fraction of steps which
         * are equilibration steps; m_equilibrationFraction.
         */
+        
+        m_sampler->sampleAllEnergies(acceptedStep);
 
-        m_sampler->sample(acceptedStep);
     }
-    m_sampler->computeAverages();
+    std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
+    m_sampler->printOutputToEnergyFile();
     
-    std::cout << "Out of MC loop" << std::endl;
-
+    m_sampler->computeAverages();
+    // m_sampler->printOutputToEnergyAlphaFile();
 }
 
-void System::runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria) {
+void System::runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria, double timeStep) {
     m_particles                 = m_initialState->getParticles();
     m_sampler                   = new Sampler(this);
     m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
+    m_timeStep                  = timeStep;
     m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
     m_sampler->setFileOutput(firstCriteria);
 
     // std::cout << "finished setting up" << std::endl;
+    int i;
 
-    for (int i=0; i < numberOfMetropolisSteps; i++) {
+    // #pragma omp parallel for default(shared) private(i)
+    for (i=0; i < numberOfMetropolisSteps; i++) {
         
         // Counting the number of steps that are accepted by checking if it was accepted
 
@@ -158,10 +166,11 @@ void System::runMetropolisStepsImportance(int numberOfMetropolisSteps, int first
         * are equilibration steps; m_equilibrationFraction.
         */
 
-        m_sampler->sample(acceptedStep);
+        m_sampler->sampleAllEnergies(acceptedStep);
+
     }
     m_sampler->computeAverages();
-    
+    m_sampler->printOutputToEnergyFile();
 }
 
 void System::setNumberOfParticles(int numberOfParticles) {
@@ -196,16 +205,6 @@ void System::setInitialState(InitialState* initialState) {
 
 void System::setAnalytical(bool statement){
     m_analytical = statement;
-}
-
-void System::setImportanceSampling(bool statement, double timeStep){
-    m_importanceSampling = statement;
-    m_timeStep = timeStep;
-}
-
-void System::setInteractionOrNot(bool statement, double hardCoreDiameter){
-    m_interactionOrNot = statement;
-    m_hardCoreDiameter = hardCoreDiameter;
 }
 
 double System::greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld){

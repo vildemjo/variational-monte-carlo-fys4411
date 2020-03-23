@@ -6,8 +6,8 @@ class System {
 public:
     bool metropolisStep             ();
     bool metropolisStepImportance   ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria);
-    void runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria);
+    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria, double stepLength);
+    void runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria, double timeStep);
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
     void setStepLength              (double stepLength);
@@ -16,8 +16,6 @@ public:
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
     void setAnalytical              (bool statement);
-    void setImportanceSampling      (bool statement, double timeStep);
-    void setInteractionOrNot        (bool statement, double hardCoreDiameter);
     void setFileName                (std::string filename) {m_filename = filename;}
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
@@ -28,8 +26,6 @@ public:
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
     bool getAnalytical()                { return m_analytical; }
-    bool getImportanceSampling()        { return m_importanceSampling; }
-    bool getInteractionOrNot()          { return m_interactionOrNot; }
     double getStepLength()              { return m_stepLength; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
     double getHardCoreDiameter()        { return m_hardCoreDiameter; }
@@ -41,14 +37,12 @@ private:
     int                             m_numberOfDimensions = 0;
     int                             m_numberOfMetropolisSteps = 0;
     bool                            m_analytical = false;
-    bool                            m_importanceSampling = false;
-    bool                            m_interactionOrNot = false;
     double                          m_diffConstant = 0.5;
-    double                          m_timeStep = 0;
     double                          m_equilibrationFraction = 0.0;
     double                          m_stepLength = 0.1;
+    double                          m_timeStep   = 0.1;
     double                          m_hardCoreDiameter = 0.5;
-    std::string                     m_filename = "no_name_given.txt";
+    std::string                     m_filename = "Output/no_name_specified";
     class WaveFunction*             m_waveFunction = nullptr;
     class Hamiltonian*              m_hamiltonian = nullptr;
     class InitialState*             m_initialState = nullptr;

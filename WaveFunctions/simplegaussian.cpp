@@ -22,6 +22,7 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
     
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
+    particles = m_system->getParticles();
 
     for(int i1=0; i1<numberOfParticles; i1++){
         auto r = particles[i1]->getPosition();
@@ -53,6 +54,8 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     int         numberOfDimensions  = m_system->getNumberOfDimensions();
     double      rSum2               = 0.0;
     double      beta                = m_system->getHamiltonian()->getBeta();
+
+    particles = m_system->getParticles();
 
     for(int i2=0; i2<numberOfParticles; i2++){
         auto r = particles[i2]->getPosition();

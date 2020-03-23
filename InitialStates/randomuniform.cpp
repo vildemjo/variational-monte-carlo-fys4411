@@ -1,4 +1,5 @@
 #include "randomuniform.h"
+#include "wavefunction.h"
 #include <iostream>
 #include <cassert>
 #include "Math/random.h"
@@ -35,8 +36,7 @@ void RandomUniform::setupInitialState() {
         for (int m3=0; m3 < m_numberOfParticles; m3++) {
             std::vector<double> position = std::vector<double>();
         
-            for (int j=0; j < m_numberOfDimensions; j++) {
-
+            for (int m4=0; m4 < m_numberOfDimensions; m4++) {
                 position.push_back(m_system->getStepLength()*(Random::nextDouble()-0.5));
             }
 
@@ -46,11 +46,9 @@ void RandomUniform::setupInitialState() {
             m_particles.at(m3)->setParticleIndex(m3);
         }
 
-        if (m_system->getInteractionOrNot() == true){
-            positionCheck = calculateInterparticleDistances();
-        }else{
-            positionCheck = true;
-        }
+        // This always returns false for the non-interacting case
+        positionCheck = m_system->getWaveFunction()->getDistanceCheck();
+
     }
     // std::cout << "Im out of the while-loop" << std::endl;
 }
