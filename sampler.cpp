@@ -64,7 +64,7 @@ void Sampler::sampleAllEnergies(bool acceptedStep) {
 
         if (m_stepNumber >= m_system->getEquilibrationFraction()*m_numberOfMetropolisSteps){
             localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
-            
+            m_system->getWaveFunction()->updateOneBodyDensity(m_system->getParticles());
             m_cumulativeEnergy  += localEnergy;
             m_cumulativeEnergySquared += localEnergy*localEnergy;
             m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
@@ -161,6 +161,23 @@ void Sampler::printOutputToEnergyFile(){
     for (int n3 = 0; n3<m_localEnergyVector.size(); n3++){
         myfile << m_localEnergyVector[n3] <<"\n";
     }
+    myfile.close();
+}
+
+void Sampler::printOneBodyDensityToFile(){
+    
+    std::vector <int> oneBodyDensity = m_system->getWaveFunction()->getOneBodyDensity();
+    
+    ofstream myfile;
+
+    string filename = m_system->getFileName() + "_density.txt";
+
+    myfile.open (filename, ios::out | ios::trunc);
+
+    for (int n5 = 0; n5<oneBodyDensity.size(); n5++){
+        myfile << (double)oneBodyDensity[n5]/(double)m_numberOfMetropolisSteps <<"\n";
+    }
+
     myfile.close();
 }
 

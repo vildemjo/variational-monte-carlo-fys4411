@@ -28,13 +28,16 @@ bool System::metropolisStep() {
     for(int m1=0;m1<m_numberOfDimensions; m1++){
         randomAmount.push_back(m_stepLength*(Random::nextDouble()-0.5));
         m_particles[randomParticleIndex]->adjustPosition(randomAmount[m1], m1);
+        // std::cout << "changeing position" << std::endl;
     }
 
     // Calculate the wave function when the random particles is in it's new position
     double newWaveFunction = m_waveFunction->evaluate(m_particles);
+    // std::cout << "have wave position" << std::endl;
 
     // Compare new wavefunction with old wavefunction
     if (Random::nextDouble() <= newWaveFunction*newWaveFunction/(oldWaveFunction*oldWaveFunction)){
+        // std::cout << "check accept" << std::endl;
         // The step was accepted and will be counted in Sampler
         return true;
         }
@@ -119,11 +122,11 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     for (i=0; i < numberOfMetropolisSteps; i++) {
         
         
-        // std::cout << "master at step numb " << i << endl;
+        
         // Counting the number of steps that are accepted by checking if it was accepted
 
         bool acceptedStep = metropolisStep();
-        
+        // std::cout << "accepted " << i << endl;
         /* Here you should sample the energy (and maybe other things using
         * the m_sampler instance of the Sampler class. Make sure, though,
         * to only begin sampling after you have let the system equilibrate
@@ -132,11 +135,12 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
         */
         
         m_sampler->sampleAllEnergies(acceptedStep);
-
+        // std::cout << "sampled " << i << endl;
     }
     std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
-    m_sampler->printOutputToEnergyFile();
     
+    m_sampler->printOutputToEnergyFile();
+    m_sampler->printOneBodyDensityToFile();
     m_sampler->computeAverages();
     // m_sampler->printOutputToEnergyAlphaFile();
 }

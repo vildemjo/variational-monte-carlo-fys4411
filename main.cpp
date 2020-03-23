@@ -30,14 +30,17 @@ int main() {
     bool analyticOrNot      = true;
     double hardCoreDiameter = 0.0043;
     int numberOfDimensions  = 3;
-    int numberOfParticles   = 10;
+    int numberOfParticles   = 3;
     int numberOfSteps       = (int) pow(2.0,21.0);
     double omega            = 1.0;          // Oscillator frequency.
     double stepLength       = 1.0;        // Metropolis step length.
     double equilibration    = 0.0;          // Fraction of the total steps used for equilibration
     double timeStep         = 0.0003;
     int firstCriteria       = 0;            // print header in file
-    double alpha            = 0.499;
+    double alpha            = 0.5;
+
+    int numberOfBins = 200;
+    double densityLength = 4.0;
 
     // elliptical or spherical trap (2.82843 or 1.0)
     double beta = 1.0; //2.82843;    // omega_normal^2/omega_ho^2
@@ -49,6 +52,8 @@ int main() {
     system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
     system->setEquilibrationFraction      (equilibration);
     system->setAnalytical                 (analyticOrNot);
+    system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
+    system->setFileName                   ("Output/testing_density_23_03_");
     system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
 
 
