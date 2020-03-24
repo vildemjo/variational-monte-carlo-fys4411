@@ -8,11 +8,10 @@
 using std::cout;
 using std::endl;
 
-HarmonicOscillator::HarmonicOscillator(System* system, double omega, double beta) :
+HarmonicOscillator::HarmonicOscillator(System* system, double omega) :
         Hamiltonian(system) {
     assert(omega > 0);
     m_omega  = omega;
-    m_beta   = beta;
 }
 
 double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) {
@@ -35,19 +34,13 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
 
-    double beta = m_system->getHamiltonian()->getBeta();
-
     std::vector <double> particlePosition(numberOfDimensions);
 
     for (int p1 = 0; p1 < numberOfParticles; p1++){
         particlePosition = particles[p1]->getPosition();
 
         for (int p2 = 0; p2 < numberOfDimensions; p2++){
-            if (p2 == 2){ // This is for the elliptical trap case, else beta = 1
-                rSum2 += beta*particlePosition[p2]*particlePosition[p2];
-            }else{
-                rSum2 += particlePosition[p2]*particlePosition[p2];
-            }
+            rSum2 += particlePosition[p2]*particlePosition[p2];
         }
     }
 

@@ -14,10 +14,7 @@ public:
     virtual std::vector<double> computeDerivative(std::vector<class Particle*> particles) = 0;
     virtual double computeAlphaDerivative(std::vector<class Particle*> particles) = 0;
     virtual bool getDistanceCheck(std::vector<class Particle*> particles) = 0;
-    double computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles);
-    std::vector <double> computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber);
-    std::vector <double> computeDerivativeOneParticle(std::vector<class Particle*> particles, int particleIndex);
-    std::vector <int> getOneBodyDensity(){ return m_oneBodyDensity; };
+     std::vector <int> getOneBodyDensity(){ return m_oneBodyDensity; };
     void setOneBodyDensityBins(int numberOfBins, double densityLength);
     
 protected:

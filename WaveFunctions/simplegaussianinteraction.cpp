@@ -7,13 +7,14 @@
 #include "InitialStates/initialstate.h"
 #include <iostream>
 
-SimpleGaussianInteraction::SimpleGaussianInteraction(System* system, double alpha, double hardCoreDiameter) :
+SimpleGaussianInteraction::SimpleGaussianInteraction(System* system, double alpha, double hardCoreDiameter, double beta) :
         WaveFunction(system) {
     assert(alpha >= 0);
     m_numberOfParameters = 1;
     m_parameters.reserve(1);
     m_parameters.push_back(alpha);
     m_system->setHardCoreDiameter(hardCoreDiameter);
+    m_beta = beta;
 }
 
 double SimpleGaussianInteraction::evaluate(std::vector<class Particle*> particles) {
@@ -21,14 +22,13 @@ double SimpleGaussianInteraction::evaluate(std::vector<class Particle*> particle
     double rSum = 0.0;
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
-    double beta = m_system->getHamiltonian()->getBeta();
 
     for(int i1=0; i1<numberOfParticles; i1++){
         auto r = particles[i1]->getPosition();
         
         for(int n1=0; n1<numberOfDimensions; n1++){
             if (n1 == 2){
-                rSum += beta*r[n1]*r[n1];
+                rSum += m_beta*r[n1]*r[n1];
             }else{
                 rSum += r[n1]*r[n1];
             }
@@ -46,7 +46,6 @@ double SimpleGaussianInteraction::evaluateCorrelationPart(std::vector<class Part
     int     numberOfParticles       = m_system->getNumberOfParticles();
     int     numberOfDimensions      = m_system->getNumberOfDimensions();
     int     uSumCheck               = 0;
-    double  beta                    = m_system->getHamiltonian()->getBeta();
     double  correlationPart         = 1;
     double  uSum                    = 0;
     double  distances_j1_j2;
@@ -90,13 +89,12 @@ double SimpleGaussianInteraction::computeDoubleDerivative(std::vector<class Part
 
     double rSum2 = 0.0;
     double interactionPart = 0;
-    double beta = m_system->getHamiltonian()->getBeta();
 
     for(int i2=0; i2<numberOfParticles; i2++){
         auto r = particles[i2]->getPosition();
         for(int n2=0; n2<numberOfDimensions; n2++){
             if (n2 == 2){
-                rSum2 += beta*r[n2]*r[n2];    
+                rSum2 += m_beta*r[n2]*r[n2];    
             }else{
                 rSum2 += r[n2]*r[n2];
             }
@@ -112,7 +110,6 @@ std::vector<double> SimpleGaussianInteraction::computeDerivative(std::vector<cla
     
     int                     numberOfDimensions          = m_system->getNumberOfDimensions();
     double                  phiPart                     = 0;
-    double                  beta                        = m_system->getHamiltonian()->getBeta();
     std::vector <double>    vectorWithInteraction       (numberOfDimensions);
     
     
@@ -123,7 +120,7 @@ std::vector<double> SimpleGaussianInteraction::computeDerivative(std::vector<cla
 
         for (int n8=0; n8<numberOfDimensions; n8++){
             if (n8 == 2){
-                phiPart = -2*getParameters()[0]*r[n8]*beta;
+                phiPart = -2*getParameters()[0]*r[n8]*m_beta;
             }else{
                 phiPart = -2*getParameters()[0]*r[n8];
             }
@@ -137,13 +134,12 @@ std::vector<double> SimpleGaussianInteraction::computeDerivative(std::vector<cla
 double SimpleGaussianInteraction::computeAlphaDerivative(std::vector<class Particle*> particles){
 
     double vectorSumSquared;
-    double beta = m_system->getHamiltonian()->getBeta();
 
     for (int i10 = 0; i10<m_system->getNumberOfParticles();i10++){
         auto r = particles[i10]->getPosition();
         for (int n10=0; n10<m_system->getNumberOfDimensions(); n10++){
             if (n10 == 2){
-                vectorSumSquared += beta*r[n10]*r[n10];
+                vectorSumSquared += m_beta*r[n10]*r[n10];
             }else{
                 vectorSumSquared += r[n10]*r[n10];
             }
@@ -233,14 +229,13 @@ std::vector <double> SimpleGaussianInteraction::computeDerivativeOfu(std::vector
 std::vector<double> SimpleGaussianInteraction::computeDerivativeOneParticle(std::vector<class Particle*> particles, int particleIndex){
     
     int                 numberOfDimensions          = m_system->getNumberOfDimensions();
-    double              beta                        = m_system->getHamiltonian()->getBeta();
     std::vector<double> derivativeVector            (numberOfDimensions);
 
     auto r = particles[particleIndex]->getPosition();
 
     for (int j3=0; j3<numberOfDimensions; j3++){
         if (j3 == 2){
-            derivativeVector[j3] = -2*getParameters()[0]*beta*r[j3];
+            derivativeVector[j3] = -2*getParameters()[0]*m_beta*r[j3];
         }else{
             derivativeVector[j3] = -2*getParameters()[0]*r[j3];
         }

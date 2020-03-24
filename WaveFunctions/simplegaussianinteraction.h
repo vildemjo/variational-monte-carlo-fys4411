@@ -3,7 +3,7 @@
 
 class SimpleGaussianInteraction : public WaveFunction {
 public:
-    SimpleGaussianInteraction(class System* system, double alpha, double HardCoreDiameter);
+    SimpleGaussianInteraction(class System* system, double alpha, double HardCoreDiameter, double beta);
     double evaluate(std::vector<class Particle*> particles);
     double computeDoubleDerivative(std::vector<class Particle*> particles);
     std::vector<double> computeDerivative(std::vector<class Particle*> particles);
@@ -23,4 +23,5 @@ private:
         calculateInterparticleDistances(particles);
         return m_distances; }
     std::vector<std::vector<double>> m_distances;
+    double m_beta = 1.0;
 };

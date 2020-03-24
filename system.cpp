@@ -116,13 +116,13 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
         
         bool acceptedStep = metropolisStep();
 
-        // m_sampler->sample(acceptedStep);
-        m_sampler->sampleAllEnergies(acceptedStep);
+        m_sampler->sample(acceptedStep);
+        // m_sampler->sampleAllEnergies(acceptedStep);
     }
     std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
     
-    m_sampler->printOutputToEnergyFile();
-    m_sampler->printOneBodyDensityToFile();
+    // m_sampler->printOutputToEnergyFile();
+    // m_sampler->printOneBodyDensityToFile();
     m_sampler->computeAverages();
     // m_sampler->printOutputToEnergyAlphaFile();
 }

@@ -39,6 +39,7 @@ int main() {
     double timeStep         = 0.003;
     int firstCriteria       = 0;            // print header in file
     double alpha            = 0.7;
+    double inititalizingStep = 0.5;
 
     int numberOfBins = 500;
     double densityLength = 2.0;
@@ -47,21 +48,72 @@ int main() {
     double beta = 1.0; //2.82843;    // omega_normal^2/omega_ho^2
 
 
-    System* system = new System();
-    system->setHamiltonian                (new HarmonicOscillator(system, omega, beta));
-    system->setWaveFunction               (new SimpleGaussian(system, alpha));
-    system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-    system->setEquilibrationFraction      (equilibration);
-    system->setAnalytical                 (analyticOrNot);
-    system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
-    system->setFileName                   ("Output/3p_3d_7_MC_check");
-    system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
+    // System* system = new System();
+    // system->setHamiltonian                (new HarmonicOscillator(system, omega));
+    // system->setWaveFunction               (new SimpleGaussian(system, alpha));
+    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles, inititalizingStep));
+    // system->setEquilibrationFraction      (equilibration);
+    // system->setAnalytical                 (analyticOrNot);
+    // system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
+    // system->setFileName                   ("Output/3p_3d_7_MC_check");
+    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
 
-    cout << "number of steps: " << numberOfSteps << endl;
+    // cout << "number of steps: " << numberOfSteps << endl;
 
-    cout << system->getSampler()->getEnergy()/(double)3.0 << endl;
+    // cout << system->getSampler()->getEnergy()/((double)3.0*3.0) << endl;
 
+    /* Initializing step check */
+
+
+    double alphaStart = 0.6;
+    double alphaStop = 0.01;
+    double alphaStep = 0.02;
+
+    string methodName = setMethodName(analyticOrNot);
+
+    std::vector <double> I = {0.5};
+
+    for (int i = 0; i < I.size(); i++ ){
+
+        ofstream energyfile;
+        
+        string filename = "initial_test/" + 
+                methodName + to_string(I[i]) + "new_energy_alpha.txt";
+
+        energyfile.open ("Output/" + filename, ios::out | ios::trunc);
+        energyfile << "Alpha: \t Energy: \n";
+        energyfile.close();
+
+        alpha = alphaStart;
+        for(int a=0; alpha > alphaStop+alphaStep; a++){
+
+            numberOfDimensions  = 3;
+            numberOfParticles   = 3;
+            numberOfSteps       = (int) std::pow(2.0,19);
+            inititalizingStep   = I[i];
+
+            System* system = new System();
+            system->setHamiltonian              (new HarmonicOscillator(system, omega));
+            system->setWaveFunction             (new SimpleGaussian(system, alpha));
+            system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles, inititalizingStep));
+            system->setEquilibrationFraction    (equilibration);
+            system->setAnalytical               (analyticOrNot);
+            system->setFileName                 (filename);
+            system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+            
+
+            alpha -= alphaStep;
+            firstCriteria = 1;
+
+            double energy = system->getSampler()->getEnergy();
+
+            energyfile.open ("Output/"+ filename, ios::out | ios::app);
+            energyfile << alpha << "\t" << energy/((double) numberOfDimensions*(double) numberOfParticles) << "\n";
+            energyfile.close();
+        }
     
+    }
+
 
 
 
@@ -423,9 +475,9 @@ void alphaListRun(string filename, int numberOfP){
     for(int a=0; alpha > alphaStop+alphaStep; a++){
 
         System* system = new System();
-        system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
+        system->setHamiltonian              (new HarmonicOscillator(system, omega));
         system->setWaveFunction             (new SimpleGaussian(system, alpha));
-        system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+        system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles, stepLength));
         system->setEquilibrationFraction    (equilibration);
         system->setAnalytical               (analyticOrNot);
         system->setFileName                 (filename);

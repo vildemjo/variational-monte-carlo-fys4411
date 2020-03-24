@@ -127,7 +127,6 @@ void Sampler::printOutputToEnergyAlphaFile(){
         myfile << " Number of dimensions : " << nd << endl;
         myfile << " Number of Metropolis steps run : 10^" << std::log10(ms) << endl;
         myfile << " Number of equilibration steps  : 10^" << std::log10(std::round(ms*ef)) << endl;
-        myfile << " Beta: " << m_system->getHamiltonian()->getBeta() << endl;
         myfile << " Step length (importance sampling): " << m_system->getStepLength() << endl;
         myfile << "===================================================" << endl;
         myfile << "Energy: \t Alpha: \t Acceptance: \n"; 

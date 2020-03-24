@@ -3,7 +3,7 @@
 
 class Particle {
 public:
-    Particle(class System* system);
+    Particle();
     void setPosition(const std::vector<double> &position);
     void adjustPosition(double change, int dimension);
     void setNumberOfDimensions(int numberOfDimensions);
