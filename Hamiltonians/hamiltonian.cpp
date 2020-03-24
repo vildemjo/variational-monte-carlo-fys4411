@@ -12,6 +12,9 @@ Hamiltonian::Hamiltonian(System* system) {
 }
 
 double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particle*> particles) {
+    /* This function calculates the double derivative of the wavefunction numerically.
+    This is used to calculate the local energy for the system. The function hence returns 
+    the double derivative divided by the wavefunction. */
 
     double step = 1e-3;
     double dpsidr2 = 0.0;
@@ -24,7 +27,6 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
     double waveLast = 0;
     double waveCurrent = 0;
 
-    // Changing the copies to obtain an array of "next step" and "previous step"
     for(int i4=0; i4<numberOfParticles; i4++){
          for(int n4=0; n4<numberOfDimensions;n4++){
             // Wave function at forward step
@@ -38,7 +40,7 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
             // Calculating the part of the double derivative which involves psi(x+dx) and psi(x-dx)
             dpsidr2 += (waveNext+waveLast)/(step*step);
 
-            // Resetting the particlepositions so that a new particle and spesific dimension can be calculated
+            // Resetting the particle positions so that a new particle and spesific dimension can be calculated
             particles[i4]->adjustPosition(step, n4); 
         }
     }
@@ -53,9 +55,14 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
 }
 
 void Hamiltonian::setInteractionPotential(bool statement){
+    /* This function is used as a sort of unit test. Steps that result in a particle
+    distance being smaller than the hard core diameter should not be accepted and sampled. */
     m_interactionPotential = 0;
     if (statement == true){
-        m_interactionPotential = 1;  // Should be infinite. 1 is to be able to check that the situations with r_ij < a are not accepted
+        m_interactionPotential = 1; // Should be infinite. 
+                                    // 1 is to be able to check 
+                                    // that the situations with 
+                                    // r_ij < a are not accepted
     }else{
         m_interactionPotential = 0;
     }

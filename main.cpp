@@ -32,13 +32,13 @@ int main() {
     double hardCoreDiameter = 0.0043;
     int numberOfDimensions  = 3;
     int numberOfParticles   = 3;
-    int numberOfSteps       = (int) pow(2.0,21.0);
+    int numberOfSteps       = (int) 1e6;//pow(2.0,21.0);
     double omega            = 1.0;          // Oscillator frequency.
     double stepLength       = 0.5;          // Metropolis step length.
     double equilibration    = 0.0;          // Fraction of the total steps used for equilibration
     double timeStep         = 0.003;
     int firstCriteria       = 0;            // print header in file
-    double alpha            = 0.5;
+    double alpha            = 0.7;
 
     int numberOfBins = 500;
     double densityLength = 2.0;
@@ -54,11 +54,13 @@ int main() {
     system->setEquilibrationFraction      (equilibration);
     system->setAnalytical                 (analyticOrNot);
     system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
-    system->setFileName                   ("Output/3p_3d_MC_check");
+    system->setFileName                   ("Output/3p_3d_7_MC_check");
     system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
 
-
     cout << "number of steps: " << numberOfSteps << endl;
+
+    cout << system->getSampler()->getEnergy()/(double)3.0 << endl;
+
     
 
 
