@@ -31,7 +31,7 @@ int main() {
     bool analyticOrNot      = true;
     double hardCoreDiameter = 0.0043;
     int numberOfDimensions  = 3;
-    int numberOfParticles   = 4;
+    int numberOfParticles   = 3;
     int numberOfSteps       = (int) pow(2.0,21.0);
     double omega            = 1.0;          // Oscillator frequency.
     double stepLength       = 0.5;          // Metropolis step length.
@@ -41,24 +41,24 @@ int main() {
     double alpha            = 0.5;
 
     int numberOfBins = 500;
-    double densityLength = 0.1;
+    double densityLength = 2.0;
 
     // elliptical or spherical trap (2.82843 or 1.0)
     double beta = 1.0; //2.82843;    // omega_normal^2/omega_ho^2
 
 
-    // System* system = new System();
-    // system->setHamiltonian                (new HarmonicOscillator(system, omega, beta));
-    // system->setWaveFunction               (new SimpleGaussian(system, alpha));
-    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-    // system->setEquilibrationFraction      (equilibration);
-    // system->setAnalytical                 (analyticOrNot);
-    // system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
-    // system->setFileName                   ("Output/4_zero_particles_24_03");
-    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
+    System* system = new System();
+    system->setHamiltonian                (new HarmonicOscillator(system, omega, beta));
+    system->setWaveFunction               (new SimpleGaussian(system, alpha));
+    system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+    system->setEquilibrationFraction      (equilibration);
+    system->setAnalytical                 (analyticOrNot);
+    system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
+    system->setFileName                   ("Output/3p_3d_MC_check");
+    system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
 
 
-    // cout << "number of steps: " << numberOfSteps << endl;
+    cout << "number of steps: " << numberOfSteps << endl;
     
 
 
@@ -68,61 +68,61 @@ int main() {
 // comparing with exact answear
 
 
-    double alphaStart = 0.6;
-    double alphaStop = 0.01;
-    double alphaStep = 0.02;
+    // double alphaStart = 0.6;
+    // double alphaStop = 0.01;
+    // double alphaStep = 0.02;
 
-    string methodName = setMethodName(analyticOrNot);
+    // string methodName = setMethodName(analyticOrNot);
 
-    std::vector <int> Ns = {2, 3, 4, 10}; //{1, 10, 50, 100, 500};
-    std::vector <int> ds = {1, 2, 3};
+    // std::vector <int> Ns = {2, 3, 4, 10}; //{1, 10, 50, 100, 500};
+    // std::vector <int> ds = {1, 2, 3};
 
-    for (int d = 0; d < ds.size(); d++){
+    // for (int d = 0; d < ds.size(); d++){
 
-        for (int N = 0; N < Ns.size(); N++ ){
+    //     for (int N = 0; N < Ns.size(); N++ ){
 
-            ofstream energyfile;
+    //         ofstream energyfile;
             
-            string filename = "exercise_b_new/" + 
-                    methodName + to_string(ds[d]) +"d_" 
-                    + to_string(Ns[N]) + "p_energy_alpha.txt";
+    //         string filename = "exercise_b_new/" + 
+    //                 methodName + to_string(ds[d]) +"d_" 
+    //                 + to_string(Ns[N]) + "p_energy_alpha.txt";
 
-            energyfile.open ("Output/" + filename, ios::out | ios::trunc);
-            energyfile << "Alpha: \t Energy: \n";
-            energyfile.close();
+    //         energyfile.open ("Output/" + filename, ios::out | ios::trunc);
+    //         energyfile << "Alpha: \t Energy: \n";
+    //         energyfile.close();
 
-            alpha = alphaStart;
-            for(int a=0; alpha > alphaStop+alphaStep; a++){
+    //         alpha = alphaStart;
+    //         for(int a=0; alpha > alphaStop+alphaStep; a++){
 
-                double energy = 0;
+    //             double energy = 0;
 
-                numberOfDimensions  = ds[d];
-                numberOfParticles   = Ns[N];
-                numberOfSteps       = (int) std::pow(2.0,19);
+    //             numberOfDimensions  = ds[d];
+    //             numberOfParticles   = Ns[N];
+    //             numberOfSteps       = (int) std::pow(2.0,19);
                 
 
-                System* system = new System();
-                system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
-                system->setWaveFunction             (new SimpleGaussian(system, alpha));
-                system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-                system->setEquilibrationFraction    (equilibration);
-                system->setAnalytical               (analyticOrNot);
-                system->setFileName                 (filename);
-                system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+    //             System* system = new System();
+    //             system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
+    //             system->setWaveFunction             (new SimpleGaussian(system, alpha));
+    //             system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+    //             system->setEquilibrationFraction    (equilibration);
+    //             system->setAnalytical               (analyticOrNot);
+    //             system->setFileName                 (filename);
+    //             system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
                 
 
-                alpha -= alphaStep;
-                firstCriteria = 1;
+    //             alpha -= alphaStep;
+    //             firstCriteria = 1;
 
-                energy = system->getSampler()->getEnergy();
+    //             energy = system->getSampler()->getEnergy();
 
-                energyfile.open ("Output/"+ filename, ios::out | ios::app);
-                energyfile << alpha << "\t" << energy << "\n";
-                energyfile.close();
-            }
+    //             energyfile.open ("Output/"+ filename, ios::out | ios::app);
+    //             energyfile << alpha << "\t" << energy << "\n";
+    //             energyfile.close();
+    //         }
         
-        }
-    }
+    //     }
+    // }
 
 
 
