@@ -22,7 +22,6 @@ double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
     
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
-    particles = m_system->getParticles();
 
     for(int i1=0; i1<numberOfParticles; i1++){
         auto r = particles[i1]->getPosition();

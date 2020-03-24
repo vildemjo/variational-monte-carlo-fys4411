@@ -17,6 +17,7 @@ public:
     void setInitialState            (class InitialState* initialState);
     void setAnalytical              (bool statement);
     void setFileName                (std::string filename) {m_filename = filename;}
+    void setHardCoreDiameter        (double hardCoreDiameter);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
     class Hamiltonian*              getHamiltonian()    { return m_hamiltonian; }
     class Sampler*                  getSampler()        { return m_sampler; }

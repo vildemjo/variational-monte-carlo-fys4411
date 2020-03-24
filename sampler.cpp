@@ -148,11 +148,11 @@ void Sampler::printOutputToEnergyFile(){
     ofstream myfile;
     // to_string(omp_get_thread_num())
 
-    std::cout << "accepted steps: " << m_numberOfAcceptedSteps << endl;
+    std::cout << "accepted steps: " << (double)m_numberOfAcceptedSteps/(double)m_numberOfMetropolisSteps << endl;
 
     // std::cout << omp_get_thread_num() << " about to print" << endl;
 
-    cout << "Length of energy vector: " << m_localEnergyVector.size() << endl;
+    // cout << "Length of energy vector: " << m_localEnergyVector.size() << endl;
 
     string filename = m_system->getFileName() + "_energy.txt";
 

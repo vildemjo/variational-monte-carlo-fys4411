@@ -5,6 +5,7 @@
 #include "sampler.h"
 #include "WaveFunctions/wavefunction.h"
 #include "WaveFunctions/simplegaussian.h"
+#include "WaveFunctions/simplegaussianinteraction.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "Hamiltonians/harmonicoscillator.h"
 #include "InitialStates/initialstate.h"
@@ -30,34 +31,34 @@ int main() {
     bool analyticOrNot      = true;
     double hardCoreDiameter = 0.0043;
     int numberOfDimensions  = 3;
-    int numberOfParticles   = 3;
+    int numberOfParticles   = 4;
     int numberOfSteps       = (int) pow(2.0,21.0);
     double omega            = 1.0;          // Oscillator frequency.
-    double stepLength       = 1.0;        // Metropolis step length.
+    double stepLength       = 0.5;          // Metropolis step length.
     double equilibration    = 0.0;          // Fraction of the total steps used for equilibration
-    double timeStep         = 0.0003;
+    double timeStep         = 0.003;
     int firstCriteria       = 0;            // print header in file
     double alpha            = 0.5;
 
-    int numberOfBins = 200;
-    double densityLength = 4.0;
+    int numberOfBins = 500;
+    double densityLength = 0.1;
 
     // elliptical or spherical trap (2.82843 or 1.0)
     double beta = 1.0; //2.82843;    // omega_normal^2/omega_ho^2
 
 
-    System* system = new System();
-    system->setHamiltonian                (new HarmonicOscillator(system, omega, beta));
-    system->setWaveFunction               (new SimpleGaussian(system, alpha));
-    system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-    system->setEquilibrationFraction      (equilibration);
-    system->setAnalytical                 (analyticOrNot);
-    system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
-    system->setFileName                   ("Output/testing_density_23_03_");
-    system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
+    // System* system = new System();
+    // system->setHamiltonian                (new HarmonicOscillator(system, omega, beta));
+    // system->setWaveFunction               (new SimpleGaussian(system, alpha));
+    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+    // system->setEquilibrationFraction      (equilibration);
+    // system->setAnalytical                 (analyticOrNot);
+    // system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
+    // system->setFileName                   ("Output/4_zero_particles_24_03");
+    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
 
 
-    cout << "number of steps: " << numberOfSteps << endl;
+    // cout << "number of steps: " << numberOfSteps << endl;
     
 
 
@@ -65,38 +66,40 @@ int main() {
 /* Exercise b */
 
 // comparing with exact answear
-/*
 
-    double alphaStart = 0.7;
+
+    double alphaStart = 0.6;
     double alphaStop = 0.01;
     double alphaStep = 0.02;
 
-    int firstCriteria = 0;                  // Criteria to print header in outputfile
-    bool analyticOrNot = true;
-    double beta = 1;
-
     string methodName = setMethodName(analyticOrNot);
 
-    std::vector <int> Ns = {1, 10, 100, 500};
+    std::vector <int> Ns = {2, 3, 4, 10}; //{1, 10, 50, 100, 500};
     std::vector <int> ds = {1, 2, 3};
 
     for (int d = 0; d < ds.size(); d++){
 
         for (int N = 0; N < Ns.size(); N++ ){
 
-            string filename = "exercise_b/" + 
+            ofstream energyfile;
+            
+            string filename = "exercise_b_new/" + 
                     methodName + to_string(ds[d]) +"d_" 
                     + to_string(Ns[N]) + "p_energy_alpha.txt";
 
-            double alpha = alphaStart;
+            energyfile.open ("Output/" + filename, ios::out | ios::trunc);
+            energyfile << "Alpha: \t Energy: \n";
+            energyfile.close();
+
+            alpha = alphaStart;
             for(int a=0; alpha > alphaStop+alphaStep; a++){
 
-                int numberOfDimensions  = ds[d];
-                int numberOfParticles   = Ns[N];
-                int numberOfSteps       = (int) 1e6;
-                double omega            = 1.0;          // Oscillator frequency.
-                double stepLength       = 0.5;          // Metropolis step length.
-                double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
+                double energy = 0;
+
+                numberOfDimensions  = ds[d];
+                numberOfParticles   = Ns[N];
+                numberOfSteps       = (int) std::pow(2.0,19);
+                
 
                 System* system = new System();
                 system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
@@ -106,15 +109,22 @@ int main() {
                 system->setAnalytical               (analyticOrNot);
                 system->setFileName                 (filename);
                 system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
-                system->getSampler()->printOutputToEnergyAlphaFile()
+                
 
                 alpha -= alphaStep;
                 firstCriteria = 1;
+
+                energy = system->getSampler()->getEnergy();
+
+                energyfile.open ("Output/"+ filename, ios::out | ios::app);
+                energyfile << alpha << "\t" << energy << "\n";
+                energyfile.close();
             }
+        
         }
     }
 
-*/
+
 
     // -------------------------------------------------------------------------------------
 
@@ -269,79 +279,121 @@ Need parallellization and also writing every energy to file
 // string filename = "total_energy_"+ to_string(n) + "p_1d";
 // alphaListRun(filename, n);
 // }
+
+/* exercise f
+
+Optimization with use of gradient descent
+
+*/
+
+    // ofstream file;
+    
+    // double energyChange = 1.0;
+    // double stopCriteria = 1e-5;
+    // double energyNew = 0.0;
+    // double energyDerivative = 0;
+    // double alphaNew = 0;
+    // double minimizationRate = 1e-1;
+    // alpha = 0.48;
+//     double energy       = 0;
+
+    // file.open ("Output/test_2p_gradient_descent.txt", ios::out | ios::trunc);
+    // file << "Alpha: \t Energy: \t Derivative: \n";
+    // file.close();
+
+
+    // for (int k=0;  energyChange > stopCriteria; k++){
+
+    //     numberOfDimensions  = 1;
+    //     numberOfParticles   = 2;
+    //     numberOfSteps       = (int) std::pow(2,19.0);
+
+    
+
+    //     System* system = new System();
+    //     system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
+    //     system->setWaveFunction             (new SimpleGaussian(system, alpha));
+    //     system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+    //     system->setEquilibrationFraction    (equilibration);
+    //     system->setAnalytical               (analyticOrNot);
+    //     system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+
+    //     firstCriteria = 1;
+        
+    //     energyNew = system->getSampler()->getEnergy();
+    //     energyDerivative = system->getSampler()->getDerivative();
+    //     alphaNew = alpha - minimizationRate*energyDerivative/numberOfParticles;
+        
+    //     energyChange = std::abs(energyNew - energy);
+    //     alpha = alphaNew;
+    //     energy = energyNew;
+
+        
+    //     file.open ("Output/test_2p_gradient_descent.txt", ios::out | ios::app);
+    //     file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
+    //     file.close();
+    // }    
+
+    /* A little more complex gradient descent */
+
+/*
+    ofstream file;
+    
+    double energyChange = 1.0;
+    double stopCriteria = 1e-5;
+    double energyNew = 0.0;
+    double energyDerivative = 0;
+    double alphaNew = 0;
+    double minimizationRate = 1e-1;
+    double previousDerivativeWeight = 0.1;
+    double energyDerivativePrevious = 0;
+    double energy = 0;
+    alpha = 0.48;
+
+    numberOfDimensions  = 3;
+    numberOfParticles   = 10;
+    numberOfSteps       = (int) std::pow(2,19.0);
+
+    string nameOfFile = "gradient_descent/" + to_string(numberOfDimensions) + "d_"
+                        + to_string(numberOfParticles) + "p_gradient_descent";
+
+    file.open ("Output/" + nameOfFile + ".txt", ios::out | ios::trunc);
+    file << "Alpha: \t Energy: \t Derivative: \n";
+    file.close();
+
+
+    for (int k=0;  energyChange > stopCriteria; k++){
+
+
+        System* system = new System();
+        system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
+        system->setWaveFunction             (new SimpleGaussian(system, alpha));
+        system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
+        system->setEquilibrationFraction    (equilibration);
+        system->setAnalytical               (analyticOrNot);
+        system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+
+        firstCriteria = 1;
+        
+        energyNew = system->getSampler()->getEnergy();
+        energyDerivativePrevious = energyDerivative;
+        energyDerivative = system->getSampler()->getDerivative();
+        alphaNew = alpha - (minimizationRate-previousDerivativeWeight)*energyDerivative/numberOfParticles - previousDerivativeWeight*energyDerivativePrevious/numberOfParticles;
+        
+        energyChange = std::abs(energyNew - energy);
+        alpha = alphaNew;
+        energy = energyNew;
+        
+        file.open ("Output/"+ nameOfFile + ".txt", ios::out | ios::app);
+        file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
+        file.close();
+    }    
+*/
+
 }
 
 
-// void gradientDecentRun(string filename, 
-//                     double alphaGuess, 
-//                     double minimizationRate, 
-//                     double stopCriteria, 
-//                     bool analyticOrNot, 
-//                     bool importanceOrNot, 
-//                     bool interactionOrNot, 
-//                     double hardCoreDiameter, 
-//                     double beta){
 
-//     int firstCriteria               = 0;                  // Criteria to print header in outputfile
-
-//     double alpha                    = alphaGuess;         // Variational parameter first guess
-//     double m_stopCriteria           = stopCriteria;       // Stopping criteria for energy vs exact energy.
-//     double m_minimizationRate       = minimizationRate;   // Model for double derivative of energy.
-//     double energyDerivative         = 1.0;
-//     double alphaChange              = 0.5;
-//     double energyChange             = 1;
-//     double alphaNew                 = alpha;
-//     double energyNew                = 0.8; 
-//     double gradientPrintToFileOrNot = false;
-
-//     ofstream file;
-//     if (gradientPrintToFileOrNot == true){
-//         file.open ("Output/gradient_descent.txt", ios::out | ios::trunc);
-//         file << "Alpha: \t Energy: \t Derivative: \n";
-//         file.close();
-//     }
-
-//     for (int k=0;  energyChange > m_stopCriteria; k++){
-
-//         int numberOfDimensions  = 1;
-//         int numberOfParticles   = 2;
-//         int numberOfSteps       = (int) 1e6;
-//         double omega            = 1.0;          // Oscillator frequency.
-//         double stepLength       = 0.5;          // Metropolis step length.
-//         double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
-//         double timeStep         = 1e-2;
-//         bool printToFileOrNot   = false;
-//         double energy           = 0;
-    
-
-//         System* system = new System();
-//         system->setHamiltonian              (new HarmonicOscillator(system, omega, beta));
-//         system->setWaveFunction             (new SimpleGaussian(system, alpha));
-//         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles));
-//         system->setEquilibrationFraction    (equilibration);
-//         system->setStepLength               (stepLength);
-//         system->setAnalytical               (analyticOrNot);
-//         system->runMetropolisSteps          (numberOfSteps, firstCriteria);
-    
-//         firstCriteria = 1;
-        
-//         energyNew = system->getSampler()->getEnergy();
-//         energyDerivative = system->getSampler()->getDerivative();
-//         alphaNew = alpha - m_minimizationRate*energyDerivative/numberOfParticles;
-        
-//         energyChange = std::abs(energyNew - energy);
-//         alpha = alphaNew;
-//         energy = energyNew;
-
-//         if (gradientPrintToFileOrNot == true){
-//             file.open ("Output/gradient_descent.txt", ios::out | ios::app);
-//             file << alpha << "\t" << energy << "\t" << energyDerivative << "\n";
-//             file.close();
-//         }
-        
-//     }
-    
-// }
 
 
 

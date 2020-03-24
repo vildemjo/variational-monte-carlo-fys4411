@@ -22,6 +22,7 @@ bool System::metropolisStep() {
 
     // Choose a random particle
     int randomParticleIndex = Random::nextInt(m_numberOfParticles-1);
+    // cout << randomParticleIndex << endl;
 
 
     // Change particle's position in all dimentions
@@ -134,13 +135,14 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
         * are equilibration steps; m_equilibrationFraction.
         */
         
-        m_sampler->sampleAllEnergies(acceptedStep);
+        // m_sampler->sampleAllEnergies(acceptedStep);
+        m_sampler->sample(acceptedStep);
         // std::cout << "sampled " << i << endl;
     }
     std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
     
-    m_sampler->printOutputToEnergyFile();
-    m_sampler->printOneBodyDensityToFile();
+    // m_sampler->printOutputToEnergyFile();
+    // m_sampler->printOneBodyDensityToFile();
     m_sampler->computeAverages();
     // m_sampler->printOutputToEnergyAlphaFile();
 }
@@ -170,11 +172,13 @@ void System::runMetropolisStepsImportance(int numberOfMetropolisSteps, int first
         * are equilibration steps; m_equilibrationFraction.
         */
 
+        // m_sampler->sample(acceptedStep);
         m_sampler->sampleAllEnergies(acceptedStep);
-
     }
-    m_sampler->computeAverages();
+    
     m_sampler->printOutputToEnergyFile();
+    m_sampler->printOneBodyDensityToFile();
+    m_sampler->computeAverages();
 }
 
 void System::setNumberOfParticles(int numberOfParticles) {
@@ -219,3 +223,6 @@ double System::greensFunctionFraction(std::vector<double> posNew, std::vector<do
     return exp(exponent);
 }
 
+void System::setHardCoreDiameter(double hardCoreDiameter){
+    m_hardCoreDiameter = hardCoreDiameter;
+}

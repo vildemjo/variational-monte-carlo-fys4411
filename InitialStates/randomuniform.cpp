@@ -45,9 +45,9 @@ void RandomUniform::setupInitialState() {
             m_particles.at(m3)->setPosition(position);
             m_particles.at(m3)->setParticleIndex(m3);
         }
-
+        // std::cout << "pos ok" << std::endl;
         // This always returns false for the non-interacting case
-        positionCheck = m_system->getWaveFunction()->getDistanceCheck();
+        positionCheck = m_system->getWaveFunction()->getDistanceCheck(m_particles);
 
     }
     // std::cout << "Im out of the while-loop" << std::endl;
