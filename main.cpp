@@ -8,6 +8,7 @@
 #include "WaveFunctions/simplegaussianinteraction.h"
 #include "Hamiltonians/hamiltonian.h"
 #include "Hamiltonians/harmonicoscillator.h"
+#include "Hamiltonians/ellipticalharmonicoscillator.h"
 #include "InitialStates/initialstate.h"
 #include "InitialStates/randomuniform.h"
 #include "Math/random.h"
@@ -17,7 +18,6 @@
 
 using namespace std;
 
-void gradientDecentRun(string filename, double alphaStart, double minimizationRate, double stopCriteria, bool analytic, bool importance, bool interactionOrNot, double hardCoreDiameter, double beta);
 void alphaListRun(string filename, int numberOfP);
 string setMethodName(bool analyticOrNot);
 
@@ -29,20 +29,21 @@ int main() {
 /* The standard set-up */
 
     bool analyticOrNot      = true;
+    bool importanceOrNot    = false;
     double hardCoreDiameter = 0.0043;
     int numberOfDimensions  = 3;
     int numberOfParticles   = 3;
     int numberOfSteps       = (int) 1e6;//pow(2.0,21.0);
     double omega            = 1.0;          // Oscillator frequency.
-    double stepLength       = 0.5;          // Metropolis step length.
+    double stepLength       = 0.7;          // Metropolis step length.
     double equilibration    = 0.0;          // Fraction of the total steps used for equilibration
     double timeStep         = 0.003;
     int firstCriteria       = 0;            // print header in file
     double alpha            = 0.7;
-    double inititalizingStep = 0.5;
+    double inititalizingStep = stepLength;
 
     int numberOfBins = 500;
-    double densityLength = 2.0;
+    double densityLength = 2.5;
 
     // elliptical or spherical trap (2.82843 or 1.0)
     double beta = 1.0; //2.82843;    // omega_normal^2/omega_ho^2
@@ -51,12 +52,13 @@ int main() {
     // System* system = new System();
     // system->setHamiltonian                (new HarmonicOscillator(system, omega));
     // system->setWaveFunction               (new SimpleGaussian(system, alpha));
-    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, numberOfParticles, inititalizingStep));
+    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, 
+    //                                             numberOfParticles, inititalizingStep));
     // system->setEquilibrationFraction      (equilibration);
     // system->setAnalytical                 (analyticOrNot);
-    // system->getWaveFunction()->setOneBodyDensityBins(numberOfBins, densityLength);
-    // system->setFileName                   ("Output/3p_3d_7_MC_check");
-    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, stepLength);
+    // system->getWaveFunction               ()->setOneBodyDensityBins(numberOfBins, densityLength);
+    // system->setFileName                   ("Output/initial_test/obd_i_not_random");
+    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, importanceOrNot, stepLength);
 
     // cout << "number of steps: " << numberOfSteps << endl;
 
@@ -78,7 +80,7 @@ int main() {
         ofstream energyfile;
         
         string filename = "initial_test/" + 
-                methodName + to_string(I[i]) + "new_energy_alpha.txt";
+                methodName + "few_MC_energy_alpha.txt";
 
         energyfile.open ("Output/" + filename, ios::out | ios::trunc);
         energyfile << "Alpha: \t Energy: \n";
@@ -99,9 +101,8 @@ int main() {
             system->setEquilibrationFraction    (equilibration);
             system->setAnalytical               (analyticOrNot);
             system->setFileName                 (filename);
-            system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+            system->runMetropolisSteps          (numberOfSteps, firstCriteria, importanceOrNot, stepLength);
             
-
             alpha -= alphaStep;
             firstCriteria = 1;
 
@@ -452,46 +453,46 @@ Optimization with use of gradient descent
 
 
 
-void alphaListRun(string filename, int numberOfP){
+// void alphaListRun(string filename, int numberOfP){
 
-    bool analyticOrNot      = true;
-    int numberOfSteps       = (int) 1e6;
-    double omega            = 1.0;          // Oscillator frequency.
-    double stepLength       = 0.5;          // Metropolis step length.
-    double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
-    int firstCriteria       = 0;            // print header in file
+//     bool analyticOrNot      = true;
+//     int numberOfSteps       = (int) 1e6;
+//     double omega            = 1.0;          // Oscillator frequency.
+//     double stepLength       = 0.5;          // Metropolis step length.
+//     double equilibration    = 0.1;          // Fraction of the total steps used for equilibration
+//     int firstCriteria       = 0;            // print header in file
 
-    // elliptical or spherical trap (2.82843 or 1.0)
-    double beta = 1.0;//2.82843;    // omega_normal^2/omega_ho^2
+//     // elliptical or spherical trap (2.82843 or 1.0)
+//     double beta = 1.0;//2.82843;    // omega_normal^2/omega_ho^2
 
-    double alphaStart = 0.6;
-    double alphaStop = 0.01;
-    double alphaStep = 0.02;
+//     double alphaStart = 0.6;
+//     double alphaStop = 0.01;
+//     double alphaStep = 0.02;
 
-    int numberOfDimensions  = 1;
-    int numberOfParticles   = numberOfP;
+//     int numberOfDimensions  = 1;
+//     int numberOfParticles   = numberOfP;
 
-    double alpha = alphaStart;
-    for(int a=0; alpha > alphaStop+alphaStep; a++){
+//     double alpha = alphaStart;
+//     for(int a=0; alpha > alphaStop+alphaStep; a++){
 
-        System* system = new System();
-        system->setHamiltonian              (new HarmonicOscillator(system, omega));
-        system->setWaveFunction             (new SimpleGaussian(system, alpha));
-        system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles, stepLength));
-        system->setEquilibrationFraction    (equilibration);
-        system->setAnalytical               (analyticOrNot);
-        system->setFileName                 (filename);
-        system->runMetropolisSteps          (numberOfSteps, firstCriteria, stepLength);
+//         System* system = new System();
+//         system->setHamiltonian              (new HarmonicOscillator(system, omega));
+//         system->setWaveFunction             (new SimpleGaussian(system, alpha));
+//         system->setInitialState             (new RandomUniform(system, numberOfDimensions, numberOfParticles, stepLength));
+//         system->setEquilibrationFraction    (equilibration);
+//         system->setAnalytical               (analyticOrNot);
+//         system->setFileName                 (filename);
+//         system->runMetropolisSteps          (numberOfSteps, firstCriteria, importanceOrNot, stepLength);
         
-        // cout << "alpha: " << alpha << endl;
-        alpha -= alphaStep;
-        firstCriteria = 1;
+//         // cout << "alpha: " << alpha << endl;
+//         alpha -= alphaStep;
+//         firstCriteria = 1;
 
         
     
-    }
+//     }
  
-}
+// }
 
 string setMethodName(bool analyticOrNot){
     string methodName;

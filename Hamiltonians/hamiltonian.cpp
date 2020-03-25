@@ -53,17 +53,3 @@ double Hamiltonian::computeDoubleDerivativeNumerically(std::vector<class Particl
     return (1/waveCurrent)*dpsidr2;
  
 }
-
-void Hamiltonian::setInteractionPotential(bool statement){
-    /* This function is used as a sort of unit test. Steps that result in a particle
-    distance being smaller than the hard core diameter should not be accepted and sampled. */
-    m_interactionPotential = 0;
-    if (statement == true){
-        m_interactionPotential = 1; // Should be infinite. 
-                                    // 1 is to be able to check 
-                                    // that the situations with 
-                                    // r_ij < a are not accepted
-    }else{
-        m_interactionPotential = 0;
-    }
-}

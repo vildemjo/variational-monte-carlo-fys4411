@@ -59,7 +59,11 @@ double EllipticalHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> p
 
     kineticEnergy = -0.5*(hbar*hbar/m)*doubleDerivative;
 
-    return potentialEnergy + kineticEnergy;
+    return potentialEnergy + kineticEnergy; // Do not need to add the interaction energy
+                                            // because the energy only sampled when the
+                                            // interaction energy is zero. This is fixed by
+                                            // the wavefunction becoming zero at the same 
+                                            // time.
 }
 
 std::vector<double> EllipticalHarmonicOscillator::computeQuantumForce(std::vector<class Particle*> particles){
@@ -73,14 +77,4 @@ std::vector<double> EllipticalHarmonicOscillator::computeQuantumForce(std::vecto
     }
 
     return derivative;
-}
-
-double EllipticalHarmonicOscillator::computeEnergyDerivative(std::vector<class Particle*> particles){
-    /* OBS! This only calculates part of the derivative. The rest is done in Sampler */
-
-    double expectationDerivative;
-
-    expectationDerivative = computeLocalEnergy(particles)*m_system->getWaveFunction()->computeAlphaDerivative(particles);
-
-    return expectationDerivative;
 }

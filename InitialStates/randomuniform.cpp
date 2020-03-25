@@ -5,6 +5,7 @@
 #include "Math/random.h"
 #include "../particle.h"
 #include "../system.h"
+#include <cmath>
 
 using std::cout;
 using std::endl;
@@ -37,6 +38,10 @@ void RandomUniform::setupInitialState() {
 
         for (int m3=0; m3 < m_numberOfParticles; m3++) {
             std::vector<double> position = std::vector<double>();
+
+            // std::vector<double> setPos = {0.2, 0.2, 0.2};
+
+            // cout << "distance: " << sqrt(setPos[0]*setPos[0] + setPos[1]*setPos[1] + setPos[2]*setPos[2]) << endl;
 
             for (int m4=0; m4 < m_numberOfDimensions; m4++) {
                 position.push_back(m_stepLength*(Random::nextDouble()-0.5));

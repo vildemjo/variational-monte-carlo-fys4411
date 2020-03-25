@@ -46,11 +46,13 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
-    if (m_system->getAnalytical() == true){
-        doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
-    }else{
-        doubleDerivative = computeDoubleDerivativeNumerically(particles);
-    }
+    // if (m_system->getAnalytical() == true){
+    //     doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+    // }else{
+    //     doubleDerivative = computeDoubleDerivativeNumerically(particles);
+    // }
+
+    doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
 
     kineticEnergy = -0.5*(hbar*hbar/m)*doubleDerivative;
 
@@ -68,14 +70,4 @@ std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Pa
     }
 
     return derivative;
-}
-
-double HarmonicOscillator::computeEnergyDerivative(std::vector<class Particle*> particles){
-    /* OBS! This only calculates part of the derivative. The rest is done in Sampler */
-
-    double expectationDerivative;
-
-    expectationDerivative = computeLocalEnergy(particles)*m_system->getWaveFunction()->computeAlphaDerivative(particles);
-
-    return expectationDerivative;
 }

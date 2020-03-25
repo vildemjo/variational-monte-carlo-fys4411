@@ -1,4 +1,5 @@
 #include "simplegaussianinteraction.h"
+#include "ellipticalharmonicoscillator.h"
 #include <cmath>
 #include <cassert>
 #include "wavefunction.h"
@@ -251,7 +252,7 @@ bool SimpleGaussianInteraction::calculateInterparticleDistances(std::vector<clas
     std::vector <double>                              vectorDistance  (m_system->getNumberOfDimensions()); 
 
     double a = m_system->getHardCoreDiameter();
-    m_system->getHamiltonian()->setInteractionPotential(false);
+    
     int distanceCheck = 0;
     std::vector <double> r1(m_system->getNumberOfDimensions()), r2(m_system->getNumberOfDimensions());
 
@@ -290,7 +291,6 @@ bool SimpleGaussianInteraction::calculateInterparticleDistances(std::vector<clas
     setDistances(distances);
 
     if (distanceCheck > 0){
-        m_system->getHamiltonian()->setInteractionPotential(true);  // Telling the interaction potential that a distance is smaller than a
         return false;
     }
     // std::cout << "have set the distances and they are bigger than a" << std::endl;

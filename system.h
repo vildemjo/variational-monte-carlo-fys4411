@@ -6,8 +6,7 @@ class System {
 public:
     bool metropolisStep             ();
     bool metropolisStepImportance   ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria, double stepLength);
-    void runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria, double timeStep);
+    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot, double stepLength);
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
     void setStepLength              (double stepLength);
@@ -16,6 +15,7 @@ public:
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
     void setAnalytical              (bool statement);
+    void setImportance              (bool statement);
     void setFileName                (std::string filename) {m_filename = filename;}
     void setHardCoreDiameter        (double hardCoreDiameter);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
@@ -27,6 +27,7 @@ public:
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
     bool getAnalytical()                { return m_analytical; }
+    bool getImportance()                { return m_importance; }
     double getStepLength()              { return m_stepLength; }
     double getEquilibrationFraction()   { return m_equilibrationFraction; }
     double getHardCoreDiameter()        { return m_hardCoreDiameter; }
@@ -38,6 +39,7 @@ private:
     int                             m_numberOfDimensions = 0;
     int                             m_numberOfMetropolisSteps = 0;
     bool                            m_analytical = false;
+    bool                            m_importance = false;
     double                          m_diffConstant = 0.5;
     double                          m_equilibrationFraction = 0.0;
     double                          m_stepLength = 0.1;

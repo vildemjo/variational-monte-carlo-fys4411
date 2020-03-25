@@ -28,9 +28,7 @@ void WaveFunction::updateOneBodyDensity(std::vector<class Particle*> particles){
         double rLength = 0;
         auto r = particles[l]->getPosition();
         for (int j3 = 0; j3 < numberOfDimensions; j3++){
-            if (j3 == 2){
                 rLength += r[j3]*r[j3];
-            }
         }
         rLength = sqrt(rLength);
         for (int j5 = 0; j5 < m_numberOfBins; j5++){

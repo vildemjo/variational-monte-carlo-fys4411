@@ -100,10 +100,11 @@ bool System::metropolisStepImportance() {
     return false;
 }
 
-void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, double stepLength) {
+void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot, double stepLength) {
     /* This function runs through the Monte Carlo cycles and performs the metropolis steps
-    through the function metropolisStep. Here the energy and the information needed to evaluate
-    the one-body density is sampled in the Sampler class and the result is printed to file. */
+    through the function metropolisStep or metropolisStepImportance. Here the energy and the 
+    information needed to evaluate the one-body density is sampled in the Sampler class and 
+    the result is printed to file. */
     
     m_particles                             = m_initialState->getParticles();
     m_sampler                               = new Sampler(this);
@@ -111,10 +112,18 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     m_stepLength                            = stepLength;
     m_sampler->setNumberOfMetropolisSteps   (numberOfMetropolisSteps);
     m_sampler->setFileOutput                (firstCriteria);
+    setImportance                           (importanceOrNot);
 
     for (int i = 0; i < m_numberOfMetropolisSteps; i++) {
         
-        bool acceptedStep = metropolisStep();
+        bool acceptedStep;
+
+        if (getImportance() == true){
+            acceptedStep = metropolisStepImportance();
+        }else{
+            acceptedStep = metropolisStep();
+        }
+        
 
         m_sampler->sample(acceptedStep);
         // m_sampler->sampleAllEnergies(acceptedStep);
@@ -127,32 +136,7 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     // m_sampler->printOutputToEnergyAlphaFile();
 }
 
-void System::runMetropolisStepsImportance(int numberOfMetropolisSteps, int firstCriteria, double timeStep) {
-    /* This function runs through the Monte Carlo cycles and performs the metropolis steps
-    through the function metropolisStepImportance. Here the energy and the information needed 
-    to evaluate the one-body density is sampled in the Sampler class and the result is printed 
-    to file. */
-    
-    m_particles                 = m_initialState->getParticles();
-    m_sampler                   = new Sampler(this);
-    m_numberOfMetropolisSteps   = numberOfMetropolisSteps;
-    m_timeStep                  = timeStep;
-    m_sampler->setNumberOfMetropolisSteps(numberOfMetropolisSteps);
-    m_sampler->setFileOutput(firstCriteria);
 
-    
-     for (int i=0; i < numberOfMetropolisSteps; i++) {
-        
-        bool acceptedStep = metropolisStepImportance();
-
-        // m_sampler->sample(acceptedStep);
-        m_sampler->sampleAllEnergies(acceptedStep);
-    }
-    
-    m_sampler->printOutputToEnergyFile();
-    m_sampler->printOneBodyDensityToFile();
-    m_sampler->computeAverages();
-}
 
 void System::setNumberOfParticles(int numberOfParticles) {
     m_numberOfParticles = numberOfParticles;
@@ -187,6 +171,12 @@ void System::setInitialState(InitialState* initialState) {
 void System::setAnalytical(bool statement){
     m_analytical = statement;
 }
+
+void System::setImportance(bool statement){
+    m_importance = statement;
+}
+
+
 
 double System::greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld){
     /* This function calculates the fraction between the Green's function for the transition
