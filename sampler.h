@@ -15,7 +15,7 @@ public:
     void printOneBodyDensityToFile();
     double getEnergy()          { return m_energy; }
     double getDerivative()      { return m_derivative; }
-    double getAcceptance()      { return 100*m_numberOfAcceptedSteps/m_numberOfMetropolisSteps; }
+    double getAcceptance()      { return 100*(double)m_numberOfAcceptedSteps/(double)m_numberOfCyclesIncluded; }
 
 private:
     int     m_numberOfMetropolisSteps = 0;

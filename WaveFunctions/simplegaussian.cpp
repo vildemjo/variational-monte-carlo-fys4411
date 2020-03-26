@@ -60,20 +60,18 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
     return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2);
 }
 
-std::vector<double> SimpleGaussian::computeDerivative(std::vector<class Particle*> particles){
+std::vector<double> SimpleGaussian::computeDerivative(int particleIndex, std::vector<class Particle*> particles){
     
     int numberOfDimensions = m_system->getNumberOfDimensions();
 
     std::vector<double> vectorSum(numberOfDimensions);
 
-    for (int i8 = 0; i8<m_system->getNumberOfParticles();i8++){
+    auto r = particles[particleIndex]->getPosition();
 
-        auto r = particles[i8]->getPosition();
-
-        for (int n8=0; n8<numberOfDimensions; n8++){
-            vectorSum[n8] += -2*getParameters()[0]*r[n8];
-        }
+    for (int n8=0; n8<numberOfDimensions; n8++){
+        vectorSum[n8] = -2*getParameters()[0]*r[n8];
     }
+
     return vectorSum;
 
 }

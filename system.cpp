@@ -25,21 +25,20 @@ bool System::metropolisStep() {
 
     // A vector to save the distances the particle is moved in
     // case it has to be moved back
-    std::vector<double> randomAmount = std::vector<double>();  
-
+    std::vector<double> randomAmount(m_numberOfDimensions);
     double   oldWaveFunction      = m_waveFunction->evaluate(m_particles);
-    int      randomParticleIndex  = Random::nextInt(m_numberOfParticles-1);
+    int      randomParticleIndex  = Random::nextInt(m_numberOfParticles);
 
-    
     for(int m1=0;m1<m_numberOfDimensions; m1++){
-        randomAmount.push_back(m_stepLength*(Random::nextDouble()-0.5));
+        randomAmount[m1] = m_stepLength*(Random::nextDouble()-0.5);
         m_particles[randomParticleIndex]->adjustPosition(randomAmount[m1], m1);
     }
 
     double newWaveFunction = m_waveFunction->evaluate(m_particles);
     
     
-    if (Random::nextDouble() <= newWaveFunction*newWaveFunction/(oldWaveFunction*oldWaveFunction)){
+    if (Random::nextDouble() <= newWaveFunction*newWaveFunction
+                                /(oldWaveFunction*oldWaveFunction)){
         return true;
         }
 
@@ -66,22 +65,19 @@ bool System::metropolisStepImportance() {
     // case it has to be moved back
     std::vector<double> importanceAmount(m_numberOfDimensions);
 
-    int particleIndex = Random::nextInt(m_numberOfParticles-1);
+    int particleIndex = Random::nextInt(m_numberOfParticles);
 
     double oldWaveFunction    = m_waveFunction->evaluate(m_particles);
-    auto   oldQuantumForce    = m_hamiltonian->computeQuantumForce(m_particles);
+    auto   oldQuantumForce    = m_hamiltonian->computeQuantumForce(particleIndex, m_particles);
     auto   oldPosition        = m_particles[particleIndex]->getPosition();
 
-
     for(int m1=0;m1<m_numberOfDimensions; m1++){
-        importanceAmount[m1] = (m_diffConstant*m_timeStep*oldQuantumForce[m1] 
-                                + Random::nextGaussian(0, 1)*sqrt(m_timeStep));
+        importanceAmount[m1] = Random::nextGaussian(0,1)*sqrt(m_timeStep)+oldQuantumForce[m1]*m_timeStep*m_diffConstant;
         m_particles[particleIndex]->adjustPosition(importanceAmount[m1], m1);
     }
-
  
     double newWaveFunction  = m_waveFunction->evaluate(m_particles);
-    auto   newQuantumForce  = m_hamiltonian->computeQuantumForce(m_particles);
+    auto   newQuantumForce  = m_hamiltonian->computeQuantumForce(particleIndex, m_particles);
     auto   newPosition      = m_particles[particleIndex]->getPosition();
 
     double greensFunctionFrac = greensFunctionFraction(oldPosition, oldQuantumForce,
@@ -100,7 +96,8 @@ bool System::metropolisStepImportance() {
     return false;
 }
 
-void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot, double stepLength) {
+void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot,
+                                                         bool allEnergiesOrNot, double stepLength) {
     /* This function runs through the Monte Carlo cycles and performs the metropolis steps
     through the function metropolisStep or metropolisStepImportance. Here the energy and the 
     information needed to evaluate the one-body density is sampled in the Sampler class and 
@@ -108,32 +105,42 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     
     m_particles                             = m_initialState->getParticles();
     m_sampler                               = new Sampler(this);
-    m_numberOfMetropolisSteps               = numberOfMetropolisSteps;
+    m_numberOfMetropolisSteps               = numberOfMetropolisSteps + m_equilibration;
     m_stepLength                            = stepLength;
-    m_sampler->setNumberOfMetropolisSteps   (numberOfMetropolisSteps);
+    m_sampler->setNumberOfMetropolisSteps   (m_numberOfMetropolisSteps);
     m_sampler->setFileOutput                (firstCriteria);
     setImportance                           (importanceOrNot);
+    setAllEnergies                          (allEnergiesOrNot);
 
     for (int i = 0; i < m_numberOfMetropolisSteps; i++) {
         
+        m_steps += 1;
+
         bool acceptedStep;
 
         if (getImportance() == true){
+            m_timeStep = getStepLength();
             acceptedStep = metropolisStepImportance();
         }else{
             acceptedStep = metropolisStep();
         }
-        
 
-        m_sampler->sample(acceptedStep);
-        // m_sampler->sampleAllEnergies(acceptedStep);
+        if (getAllEnergies() == true){
+            m_sampler->sampleAllEnergies(acceptedStep);
+        }else{
+            m_sampler->sample(acceptedStep);
+        }
     }
     std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
     
-    // m_sampler->printOutputToEnergyFile();
-    // m_sampler->printOneBodyDensityToFile();
+
+    if (getAllEnergies() == true){
+        m_sampler->printOutputToEnergyFile();
+        m_sampler->printOneBodyDensityToFile();
+    }
+
     m_sampler->computeAverages();
-    // m_sampler->printOutputToEnergyAlphaFile();
+
 }
 
 
@@ -151,9 +158,9 @@ void System::setStepLength(double stepLength) {
     m_stepLength = stepLength;
 }
 
-void System::setEquilibrationFraction(double equilibrationFraction) {
-    assert(equilibrationFraction >= 0);
-    m_equilibrationFraction = equilibrationFraction;
+void System::setEquilibration(double equilibration) {
+    assert(equilibration >= 0);
+    m_equilibration = equilibration;
 }
 
 void System::setHamiltonian(Hamiltonian* hamiltonian) {
@@ -176,7 +183,9 @@ void System::setImportance(bool statement){
     m_importance = statement;
 }
 
-
+void System::setAllEnergies(bool statement){
+    m_allEnergies = statement;
+}
 
 double System::greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld){
     /* This function calculates the fraction between the Green's function for the transition
@@ -186,10 +195,8 @@ double System::greensFunctionFraction(std::vector<double> posNew, std::vector<do
     double exponent;
 
     for (int n10=0; n10<m_numberOfDimensions; n10++){
-        exponent += 0.5*(posNew[n10]*(forceNew[n10]-forceOld[n10]) 
-                + posOld[n10]*(forceNew[n10] + forceOld[n10]) 
-                + 0.5*m_diffConstant*m_timeStep
-                *(forceOld[n10]*forceOld[n10]-forceNew[n10]*forceNew[n10]));
+        exponent += 0.5*(forceOld[n10]+forceNew[n10])*
+	            (m_diffConstant*m_timeStep*0.5*(forceOld[n10]-forceNew[n10])-posNew[n10]+posOld[n10]);
     }
     return exp(exponent);
 }

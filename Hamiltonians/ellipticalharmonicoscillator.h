@@ -7,7 +7,7 @@ public:
     EllipticalHarmonicOscillator(System* system, double omega, double gamma);
 
     double                  computeLocalEnergy          (std::vector<Particle*> particles);
-    std::vector<double>     computeQuantumForce         (std::vector<class Particle*> particles);
+    std::vector<double>     computeQuantumForce         (int particleIndex, std::vector<class Particle*> particles);
     
 private:
     double                  m_omega = 0;

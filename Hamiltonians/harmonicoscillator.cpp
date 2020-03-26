@@ -46,24 +46,24 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
 
     potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
-    // if (m_system->getAnalytical() == true){
-    //     doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
-    // }else{
-    //     doubleDerivative = computeDoubleDerivativeNumerically(particles);
-    // }
+    if (m_system->getAnalytical() == true){
+        doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+    }else{
+        doubleDerivative = computeDoubleDerivativeNumerically(particles);
+    }
 
-    doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+    // doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
 
     kineticEnergy = -0.5*(hbar*hbar/m)*doubleDerivative;
 
     return potentialEnergy + kineticEnergy;
 }
 
-std::vector<double> HarmonicOscillator::computeQuantumForce(std::vector<class Particle*> particles){
+std::vector<double> HarmonicOscillator::computeQuantumForce(int particleIndex, std::vector<class Particle*> particles){
     /* This function calculates the quantum force/drift force with is used for importance
         sampling. The quantum force is given by the derivative of the wavefunction. */
     
-     auto derivative = m_system->getWaveFunction()->computeDerivative(particles);
+     auto derivative = m_system->getWaveFunction()->computeDerivative(particleIndex, particles);
 
     for (int m=0;m<m_system->getNumberOfDimensions();m++){
         derivative[m] *= 2;

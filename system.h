@@ -6,16 +6,17 @@ class System {
 public:
     bool metropolisStep             ();
     bool metropolisStepImportance   ();
-    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot, double stepLength);
+    void runMetropolisSteps         (int numberOfMetropolisSteps, int firstCriteria, bool importanceOrNot, bool allEnergiesOrNot, double stepLength);
     void setNumberOfParticles       (int numberOfParticles);
     void setNumberOfDimensions      (int numberOfDimensions);
     void setStepLength              (double stepLength);
-    void setEquilibrationFraction   (double equilibrationFraction);
+    void setEquilibration           (double equilibration);
     void setHamiltonian             (class Hamiltonian* hamiltonian);
     void setWaveFunction            (class WaveFunction* waveFunction);
     void setInitialState            (class InitialState* initialState);
     void setAnalytical              (bool statement);
     void setImportance              (bool statement);
+    void setAllEnergies             (bool statement);
     void setFileName                (std::string filename) {m_filename = filename;}
     void setHardCoreDiameter        (double hardCoreDiameter);
     class WaveFunction*             getWaveFunction()   { return m_waveFunction; }
@@ -26,10 +27,12 @@ public:
     int getNumberOfParticles()          { return m_numberOfParticles; }
     int getNumberOfDimensions()         { return m_numberOfDimensions; }
     int getNumberOfMetropolisSteps()    { return m_numberOfMetropolisSteps; }
+    int getSteps()                      { return m_steps; }
     bool getAnalytical()                { return m_analytical; }
     bool getImportance()                { return m_importance; }
+    bool getAllEnergies()               { return m_allEnergies;}
     double getStepLength()              { return m_stepLength; }
-    double getEquilibrationFraction()   { return m_equilibrationFraction; }
+    double getEquilibration()           { return m_equilibration; }
     double getHardCoreDiameter()        { return m_hardCoreDiameter; }
     std::string getFileName()                { return m_filename; }
     double greensFunctionFraction(std::vector<double> posNew, std::vector<double> posOld, std::vector<double> forceNew, std::vector<double> forceOld);
@@ -38,10 +41,12 @@ private:
     int                             m_numberOfParticles = 0;
     int                             m_numberOfDimensions = 0;
     int                             m_numberOfMetropolisSteps = 0;
+    int                             m_steps = 0;
     bool                            m_analytical = false;
     bool                            m_importance = false;
+    bool                            m_allEnergies = false;
     double                          m_diffConstant = 0.5;
-    double                          m_equilibrationFraction = 0.0;
+    int                             m_equilibration = 0;
     double                          m_stepLength = 0.1;
     double                          m_timeStep   = 0.1;
     double                          m_hardCoreDiameter = 0.5;
