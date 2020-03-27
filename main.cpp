@@ -55,26 +55,26 @@ int main() {
     start = clock();
 
 
-    System* system = new System();
-    system->setHamiltonian                (new HarmonicOscillator(system, omega));
-    system->setWaveFunction               (new SimpleGaussian(system, alpha));
-    system->setInitialState               (new RandomUniform(system, numberOfDimensions, 
-                                                numberOfParticles, inititalizingStep));
-    system->setEquilibration              (equilibration);
-    system->setAnalytical                 (analyticOrNot);
-    system->getWaveFunction               ()->setOneBodyDensityBins(numberOfBins, densityLength);
-    system->setFileName                   ("Output/test_rSum");
-    system->runMetropolisSteps            (numberOfSteps, firstCriteria, importanceOrNot, 
-                                                            allEnergiesOrNot, stepLength);
+    // System* system = new System();
+    // system->setHamiltonian                (new HarmonicOscillator(system, omega));
+    // system->setWaveFunction               (new SimpleGaussian(system, alpha));
+    // system->setInitialState               (new RandomUniform(system, numberOfDimensions, 
+    //                                             numberOfParticles, inititalizingStep));
+    // system->setEquilibration              (equilibration);
+    // system->setAnalytical                 (analyticOrNot);
+    // system->getWaveFunction               ()->setOneBodyDensityBins(numberOfBins, densityLength);
+    // system->setFileName                   ("Output/test_rSum");
+    // system->runMetropolisSteps            (numberOfSteps, firstCriteria, importanceOrNot, 
+    //                                                         allEnergiesOrNot, stepLength);
 
-    cout << "number of steps: " << numberOfSteps << endl;
+    // cout << "number of steps: " << numberOfSteps << endl;
 
-    cout << "energy: " << system->getSampler()->getEnergy()/((double) numberOfParticles*numberOfDimensions) << endl;
-    cout << "should be: " << 0.5*alpha + 1/(8.0*alpha) << endl;
+    // cout << "energy: " << system->getSampler()->getEnergy()/((double) numberOfParticles*numberOfDimensions) << endl;
+    // cout << "should be: " << 0.5*alpha + 1/(8.0*alpha) << endl;
 
-    end = clock();
-    double time_taken = double(end - start) / double(CLOCKS_PER_SEC); 
-    cout << "CPU time: " << time_taken << " seconds" << endl;
+    // end = clock();
+    // double time_taken = double(end - start) / double(CLOCKS_PER_SEC); 
+    // cout << "CPU time: " << time_taken << " seconds" << endl;
 
 
 
@@ -140,8 +140,8 @@ int main() {
 
 // printing energy-files for some alphas
 /*
-    double alphaStart = 0.7;
-    double alphaStop = 0.2;
+    double alphaStart = 0.65;
+    double alphaStop = 0.35;
     double alphaStep = 0.05;
     
     allEnergiesOrNot = true;
@@ -149,7 +149,7 @@ int main() {
 
     string methodName = setMethodName(analyticOrNot);
 
-    std::vector <int> Ns = {1, 10, 50, 100, 500};
+    std::vector <int> Ns = {100, 500};//, };
     std::vector <int> ds = {3};
 
     for (int d = 0; d < ds.size(); d++){
@@ -157,7 +157,7 @@ int main() {
         for (int N = 0; N < Ns.size(); N++ ){
 
             alpha = alphaStart;
-            for(int a=0; alpha > alphaStop; a++){
+            for(int a=0; alpha >= alphaStop; a++){
 
                 double alphaPrint = alpha*100.0;
                 int alphaPrintable = ceil(alphaPrint);    
@@ -249,21 +249,21 @@ int main() {
 Implementing importance sampling and comparing with former results. 
 Will the number of accepted steps increase?
 */
-
 /*
+
     analyticOrNot    = true;
     allEnergiesOrNot = false;
-    importanceOrNot  = true;
+    importanceOrNot  = false;
 
     numberOfDimensions  = 3;
-    numberOfParticles   = 10;
+    numberOfParticles   = 3;
     alpha               = 0.45;
     numberOfSteps       = (int) pow(2.0, 20.0);
 
     string methodName = setMethodName(analyticOrNot);
     string samplingType;
 
-    std::vector <double> dls = {1.0, 0.1, 0.04, 0.01, 0.005};
+    std::vector <double> dls = {1.0, 0.5, 0.1, 0.05, 0.01, 0.005};
 
     ofstream thisfile;
 
@@ -319,6 +319,82 @@ Will the number of accepted steps increase?
 
     }
 */
+
+
+
+    analyticOrNot    = true;
+    allEnergiesOrNot = false;
+    importanceOrNot  = false;
+
+    numberOfDimensions  = 3;
+    numberOfParticles   = 3;
+    alpha               = 0.45;
+
+    string methodName = setMethodName(analyticOrNot);
+    string samplingType;
+
+    std::vector <double> MC = {10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0, 24.0, 26.0};
+
+    ofstream thisfile;
+
+    double timeStep;
+
+
+    if (importanceOrNot == true){
+        samplingType = "importance";
+        timeStep = 0.005;
+    }else{
+        samplingType = "brute_force";
+        timeStep = 0.5;
+    }
+
+    string file_name = "Output/exercise_c/" + methodName + 
+                        to_string(numberOfParticles) + "p_" +
+                        to_string(numberOfDimensions) + 
+                        "d_" + samplingType + "MC_cycles.txt";
+
+    thisfile.open(file_name, ios::out | ios::trunc);
+    thisfile << " Step lenght: \t acceptance [%]: \t energy: \t CPU time: \n";
+    thisfile.close();
+
+    for (int mc = 0; mc < MC.size(); mc++ ){
+
+        numberOfSteps       = (int) pow(2.0, MC[mc]);
+
+        clock_t start, end;
+        // Recording the starting clock tick.
+        start = clock();
+
+                  // Metropolis step length.
+        inititalizingStep = timeStep;
+
+        System* system = new System();
+        system->setHamiltonian                (new HarmonicOscillator(system, omega));
+        system->setWaveFunction               (new SimpleGaussian(system, alpha));
+        if (importanceOrNot == true){
+            system->setInitialState           (new GaussianDistribution(system, numberOfDimensions, 
+                                                        numberOfParticles, inititalizingStep));
+        }else{
+            system->setInitialState           (new RandomUniform(system, numberOfDimensions, 
+                                                        numberOfParticles, inititalizingStep));
+        }
+        system->setEquilibration              (equilibration);
+        system->setAnalytical                 (analyticOrNot);
+        system->runMetropolisSteps            (numberOfSteps, firstCriteria, 
+                                                importanceOrNot, allEnergiesOrNot, timeStep);
+        
+        end = clock();
+        double time_taken = double(end - start) / double(CLOCKS_PER_SEC); 
+
+        thisfile.open(file_name, ios::out | ios::app);
+
+        thisfile << MC[mc] << "\t" << 
+                    system->getSampler()->getAcceptance() << "\t" <<
+                    system->getSampler()->getEnergy() << "\t"<<
+                    time_taken << "\n"; 
+        thisfile.close();
+
+    }
 
 // Comparing with exercise b
 

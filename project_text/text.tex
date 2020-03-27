@@ -1,0 +1,101 @@
+\section{The derivatives and the local energy}
+
+In order to find the drift force and the local energy analytically we need to calcualte both the derivative and the double derivative of the trial wavefunction.
+
+\subsection{The derivative of the trial wave function}
+
+We separete the total trial wave function (Eq. \ref{eq:trialwf}) into the onebody part and the interaction part,
+\begin{equation}
+\Psi_T = \Psi_{ob}\Psi_{in}.
+\end{equation}
+
+Using the product rule, the derivative with regards to the particle $k$ is
+$$ \nabla_k \Psi_T =  \Psi_{ob}\nabla_k\Psi_{in} + \nabla_k\Psi_{ob}\Psi_{in}.$$
+(Here the operator $\nabla_k$ only works on the first function after it.)
+
+So we have to calculate $\nabla_k\Psi_{ob}$ and $\nabla_k\Psi_{in}$ and insert the expressions into the equation above.
+
+We have (if $g(\mathbf{r}_k,\alpha) = \phi(\mathbf{r}_k)$)
+\begin{equation}\label{eq:psi_ob_derivative}
+\nabla_k\Psi_{ob} = \nabla_k \phi(\mathbf{r}_k)\prod_{k\neq i}^N \phi(\mathbf{r}_i)= \frac{\nabla_k \phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} \Psi_{ob}
+\end{equation}
+using the chain rule.
+
+The interaction part is a little more complicated. We start with
+$$ \nabla_k\Psi_{in} = \nabla_k  \exp{\left(\sum_{j<i}u(r_{ji})\right)} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k}  u\left(r_{kl}\right) \nabla_k u (r_{kl}) $$. Because it is an exponential function we have to multiply the original function with the sum over all the terms in the exponent that are dependant on the particle $k$. Because $u(r_{kj}) = u(r_{jk})$ this sum is $\sum^N_{l \neq k}  u\left(r_{kl}\right)$. In addition we have to multiply with the derivative of $u(r_{kl})$ because of the chain rule. Since we have a sort of simplified way of showing the derivative (using the operator $\nabla_k$), the expression $u(r_{kj})\nabla_k u(r_{kj}) = \nabla_k u(r_{kj})$ by using the chain rule the opposite way. We then have the expression
+$$ \nabla_k\Psi_{in} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k} \nabla_k u (r_{kl}) = \sum^N_{l \neq k} \nabla_k u (r_{kl}) \Psi_{in}$$
+for the derivative of the interaction part of the wave function.
+
+The total expression of the derivative of the trial wave function is hence 
+\begin{align}
+\nabla_k \Psi_T &= \Psi_{ob}\nabla_k\Psi_{in} + \nabla_k\Psi_{ob}\Psi_{in}\\
+ &= \prod_{k\neq i}^N \phi(\mathbf{r}_i)\exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k} \nabla_k u (r_{kl}) + \nabla_k \phi(\mathbf{r}_k)\prod_{k\neq i}^N \phi(\mathbf{r}_i) \exp{\left(\sum_{j<i}u(r_{ji})\right)}\\
+ &= \Psi_{ob}\sum^N_{l \neq k} \nabla_k u (r_{kl}) \Psi_{in}+ \frac{\nabla_k \phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} \Psi_{ob}\Psi_{in}\\
+ &= \left(\sum^N_{l \neq k} \nabla_k u (r_{kl})+ \frac{\nabla_k \phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}\right) \Psi_T 
+\end{align}
+
+\subsection{The double derivative of the trial wave function}
+
+The double derivative with regards to particle $k$ is
+
+\begin{equation}\label{eq:total_double_start}
+nabla^2_k \Psi_T =  \Psi_{ob}\nabla^2_k\Psi_{in} + 2\nabla_k\Psi_{ob}\nabla_k\Psi_{in} + \Psi_{ob}\nabla^2_k\Psi_{in}.
+\end{equation}
+So we have to calculate $\nabla^2_k\Psi_{ob}$ and $\nabla^2_k\Psi_{in}$, in addition to the derivatives form the prevoius section, and insert the expressions into the equation above.
+
+From Eq. \ref{eq:psi_ob_derivative} we find
+$$ \nabla^2_k\Psi_{ob} = \nabla^2_k \phi(\mathbf{r}_k)\prod_{k\neq i}^N \phi(\mathbf{r}_i) = \frac{\nabla^2_k \phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} \Psi_{ob},$$
+since $\prod_{k\neq i}^N \phi(\mathbf{r}_i)$ is indepedant of the particle $k$.
+
+For the double derivative of $\Psi_{in}$ we use the product rule again
+\begin{equation}\label{eq:double_derivative_start}
+\nabla^2_k\Psi_{in} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] +\nabla_k\left[ \exp{\left(\sum_{j<i}u(r_{ji})\right)}\right] \sum^N_{l \neq k} \nabla_k u (r_{kl}).
+\end{equation}
+Here the square brakets are used to show what $\nabla_k$ applies to. So,
+
+$$\nabla_k\left[ \exp{\left(\sum_{j<i}u(r_{ji})\right)}\right]=  \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l' \neq k} \nabla_k u (r_{kl'})$$ as in the previous section. We calculate $ \nabla_k u(r_{kl'})$ using the chain rule and get
+$$ \nabla_k u(r_{kl'})  = \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} u'(r_{kl'}), $$ where $u'(r_{kl'}) = \frac{d}{dr_{kl'}}u(r_{kl'})$, because $$\frac{d}{d\mathbf{r}_{k}}r_{kl'} =\frac{d}{d\mathbf{r}_k}\sqrt{(x_k-x_{l'})^2 + (y_k-y_{l'})^2 + (z_k-z_{l'})^2} = \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} $$ and then
+$$\nabla_k\left[ \exp{\left(\sum_{j<i}u(r_{ji})\right)}\right]=  \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l' \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} u'(r_{kl'}) = \Psi_{in} \sum^N_{l' \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} u'(r_{kl'})  $$
+
+Next, we have
+\begin{equation}\label{eq:double_der_part_in}
+\nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] = \nabla_k \left[ \sum^N_{l \neq k}  \Psi_{in} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl}) \right] = \sum^N_{l \neq k} \nabla_k \left[ d \cdot \frac{a}{b} \cdot c \right]
+\end{equation}
+where $a = \left(\mathbf{r}_k-\mathbf{r}_{l}\right)$, $b= r_{kl}=|\mathbf{r}_k-\mathbf{r}_{l}|$ , $c = u'(r_{kl})$ and $d = \Psi_{in}= \exp\left(\sum_{i<j}^N u(r_{ij})\right)$. Furthermore, $a' = \frac{d}{d\mathbf{r}_k} \left(\mathbf{r}_k-\mathbf{r}_{l}\right) = \frac{d}{dx_k} x_k  + \frac{d}{dy_k} y_k  +\frac{d}{dz_k} z_k   = 3$ (the number of dimensions), $b' = \frac{d}{d\mathbf{r}_k} r_{kl} = \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$, $c' = \frac{d}{d\mathbf{r}_k} u'(r_{kl}) =  u''(r_{kl})\frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$ and $d' = \Psi_{in} \sum^N_{l \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl})$. Inserting all these expression into Eq. \ref{eq:double_der_part_in} gives (skipping some of the simplifications since the explaination is in the above part)
+\begin{align}
+\nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] &= \sum^N_{l \neq k} \left( \left(\frac{3r_{kl}}{\left(\mathbf{r}_k-\mathbf{r}_{l}\right)^2}-\frac{1}{r_{kl}}\right)u'(r_{kl}) + u''(r_{kl})\right) \frac{\left(\mathbf{r}_k-\mathbf{r}_{l}\right)^2}{r_{kl}^2} \Psi_{in} \\ \label{eq:doble_der_u}
+&= \sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{kl}) + u''(r_{kl})\right) \Psi_{in}
+\end{align}
+When we insert the results into Eq. \ref{eq:double_derivative_start} we get
+$$\nabla^2_k\Psi_{in} = \Psi_{in}\sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{kl}) + u''(r_{kl})\right) \Psi_{in} +  \Psi_{in} \sum^N_{l' \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} u'(r_{kl'}) \Psi_{in} \sum^N_{l \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl})  $$
+
+$$\nabla^2_k\Psi_{in} = \Psi^2_{in} \left[\sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{kl}) + u''(r_{kl})\right) +   \sum^N_{l' \neq k} \sum^N_{l \neq k} \frac{(\mathbf{r}_k - \mathbf{r}_{l'})(\mathbf{r}_k - \mathbf{r}_{l})}{r_{kl'}r_{kl}}  u'(r_{kl})u'(r_{kl'}) \right] $$
+
+Incerting it all into Eq. \ref{eq:double_derivative_start} and dividing by the trial wavefunction (as we will do to find the local energy) gives
+\begin{align*}
+   \frac{1}{\Psi_T(\mathbf{r})}\nabla_k^2\Psi_T(\mathbf{r})
+   &= \frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
+   + 2\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
+   \left(\sum_{l\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)}{r_{kl}}u'(r_{kl})\right)
+   \\
+   &\qquad
+   + \sum_{l\ne k}\sum_{l' \ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)(\mathbf{r}_k-\mathbf{r}_{l'})}{r_{kl}r_{kl'}}u'(r_{kl})u'(r_{kl'})
+   \\
+   &\qquad
+   + \sum_{l\ne k}\left( u''(r_{kl})+\frac{2}{r_{kl}}u'(r_{kl})\right).
+\end{align*}
+
+\subsection{Local energy}
+
+To calculate the kinetic energy part of the local energy we use the last expression in the previous section, sum over all particles $k$. We use $\phi(\mathbf{r}_k)$ from Eq. \ref{eq:phi} and find 
+
+$$ \sum_k^N\frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha Nd + 4 \alpha^2 \sum_k^N \mathbf{r}_k^2 $$ where $d$ is the number of dimensions and $\mathbf{r}_k^2 = x_k^2 + y_k^2+\beta z_k^2$. (This is the expression for the kinetic part of the local energy if there is no interaction.) Furthermore,
+
+$$ \sum_k^N\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha  \mathbf{r}_k. $$ 
+We also have
+\begin{align*}
+u'(r_{kl}) &= -\frac{a}{ar_{kl}-r_{kl}^2} \text{ and }\\
+u''(r_{kl}) ) &= \frac{a(a-2r_{kl})}{r_{kl}^2(a-r_{kl})^2}
+\end{align*} for $r_{kl} > a$. The other case is not relevant because the local energy is never sampled if $r_{kl} < a$. Then the wave equation is zero. With this the local energy can be calculated analytically.
+
+To get the potential energy part of the local energy the sum over all particles $k$ is made with the relevant expression for the trap from Eq. \ref{eq:trap_eqn}. THis is done for both the analytical and the numerical evaluation of the local energy.
