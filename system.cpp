@@ -26,7 +26,7 @@ bool System::metropolisStep() {
     // A vector to save the distances the particle is moved in
     // case it has to be moved back
     std::vector<double> randomAmount(m_numberOfDimensions);
-    double   oldWaveFunction      = m_waveFunction->evaluate(m_particles);
+    double   oldWaveFunction      = m_waveFunction->evaluate();
     int      randomParticleIndex  = Random::nextInt(m_numberOfParticles);
 
     for(int m1=0;m1<m_numberOfDimensions; m1++){
@@ -34,7 +34,7 @@ bool System::metropolisStep() {
         m_particles[randomParticleIndex]->adjustPosition(randomAmount[m1], m1);
     }
 
-    double newWaveFunction = m_waveFunction->evaluate(m_particles);
+    double newWaveFunction = m_waveFunction->evaluate();
     
     
     if (Random::nextDouble() <= newWaveFunction*newWaveFunction
@@ -67,7 +67,7 @@ bool System::metropolisStepImportance() {
 
     int particleIndex = Random::nextInt(m_numberOfParticles);
 
-    double oldWaveFunction    = m_waveFunction->evaluate(m_particles);
+    double oldWaveFunction    = m_waveFunction->evaluate();
     auto   oldQuantumForce    = m_hamiltonian->computeQuantumForce(particleIndex, m_particles);
     auto   oldPosition        = m_particles[particleIndex]->getPosition();
 
@@ -76,7 +76,7 @@ bool System::metropolisStepImportance() {
         m_particles[particleIndex]->adjustPosition(importanceAmount[m1], m1);
     }
  
-    double newWaveFunction  = m_waveFunction->evaluate(m_particles);
+    double newWaveFunction  = m_waveFunction->evaluate();
     auto   newQuantumForce  = m_hamiltonian->computeQuantumForce(particleIndex, m_particles);
     auto   newPosition      = m_particles[particleIndex]->getPosition();
 
@@ -92,7 +92,7 @@ bool System::metropolisStepImportance() {
     for(int m4=0;m4<m_numberOfDimensions; m4++){
         m_particles[particleIndex]->adjustPosition(-importanceAmount[m4], m4);
     }
-
+    // std::cout << "step not accepted" << std::endl;
     return false;
 }
 
@@ -102,7 +102,7 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     through the function metropolisStep or metropolisStepImportance. Here the energy and the 
     information needed to evaluate the one-body density is sampled in the Sampler class and 
     the result is printed to file. */
-    
+
     m_particles                             = m_initialState->getParticles();
     m_sampler                               = new Sampler(this);
     m_numberOfMetropolisSteps               = numberOfMetropolisSteps + m_equilibration;
@@ -133,13 +133,12 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
     }
     std::cout << "finished MC loop for alpha "<< getWaveFunction()->getParameters()[0] << std::endl;
     
+    m_sampler->computeAverages();
 
     if (getAllEnergies() == true){
         m_sampler->printOutputToEnergyFile();
         m_sampler->printOneBodyDensityToFile();
     }
-
-    m_sampler->computeAverages();
 
 }
 
@@ -192,7 +191,7 @@ double System::greensFunctionFraction(std::vector<double> posNew, std::vector<do
     from the old state to the new and the transition from the new to the old. This expression
     is used to determine wether a move is accepted or not when importance sampling is used. */
     
-    double exponent;
+    double exponent = 0;
 
     for (int n10=0; n10<m_numberOfDimensions; n10++){
         exponent += 0.5*(forceOld[n10]+forceNew[n10])*

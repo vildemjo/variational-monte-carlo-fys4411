@@ -18,40 +18,29 @@ SimpleGaussianInteraction::SimpleGaussianInteraction(System* system, double alph
     m_beta = beta;
 }
 
-double SimpleGaussianInteraction::evaluate(std::vector<class Particle*> particles) {
+double SimpleGaussianInteraction::evaluate() {
 
-    double rSum = 0.0;
-    int numberOfParticles = m_system->getNumberOfParticles();
-    int numberOfDimensions = m_system->getNumberOfDimensions();
+    auto rSum = calculatePositionSumSquared();
 
-    for(int i1=0; i1<numberOfParticles; i1++){
-        auto r = particles[i1]->getPosition();
-        
-        for(int n1=0; n1<numberOfDimensions; n1++){
-            if (n1 == 2){
-                rSum += m_beta*r[n1]*r[n1];
-            }else{
-                rSum += r[n1]*r[n1];
-            }
-        }
+    double interactionPart = evaluateCorrelationPart();
+
+    if (interactionPart == 0){
+        // std::cout << "interactionpart is 0 in evaluate" << std::endl;
     }
-
-    double interactionPart = evaluateCorrelationPart(particles);
 
     return exp(-m_parameters[0]*rSum)*interactionPart;
 
 }
 
-double SimpleGaussianInteraction::evaluateCorrelationPart(std::vector<class Particle*> particles) {
+double SimpleGaussianInteraction::evaluateCorrelationPart() {
 
     int     numberOfParticles       = m_system->getNumberOfParticles();
-    int     numberOfDimensions      = m_system->getNumberOfDimensions();
     int     uSumCheck               = 0;
     double  correlationPart         = 1;
     double  uSum                    = 0;
-    double  distances_j1_j2;
+    double  distances_j1_j2         = 0;
     auto    a                       = m_system->getHardCoreDiameter();
-    auto    distances               = getDistances(particles);
+    auto    distances               = getDistances(m_system->getParticles());
     
     std::vector<double> distances_j1(numberOfParticles);
     std::vector<double> distances_j2(numberOfParticles);
@@ -63,8 +52,9 @@ double SimpleGaussianInteraction::evaluateCorrelationPart(std::vector<class Part
 
         for (int j2 = j1+1; j2 <numberOfParticles; j2++){
             distances_j1_j2 = distances_j1[j2];
+            std::cout << "distance: " << distances_j1_j2 << std::endl;
             if ( distances_j1_j2 <= a ) {
-                    uSumCheck += 1;
+                uSumCheck += 1;
             }else{
                 uSum += log(1-a/distances_j1_j2);
             }
@@ -75,6 +65,7 @@ double SimpleGaussianInteraction::evaluateCorrelationPart(std::vector<class Part
     // if one of the distances are less than a
     if (uSumCheck > 0){
         correlationPart = 0;
+        // std::cout << "interaction part set to 0" << std::endl;
     }else{
         correlationPart = exp(uSum);
     }
@@ -83,84 +74,87 @@ double SimpleGaussianInteraction::evaluateCorrelationPart(std::vector<class Part
 
 }
 
-double SimpleGaussianInteraction::computeDoubleDerivative(std::vector<class Particle*> particles) {
+double SimpleGaussianInteraction::computeDoubleDerivative() {
 
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
 
-    double rSum2 = 0.0;
     double interactionPart = 0;
 
-    for(int i2=0; i2<numberOfParticles; i2++){
-        auto r = particles[i2]->getPosition();
-        for(int n2=0; n2<numberOfDimensions; n2++){
-            if (n2 == 2){
-                rSum2 += m_beta*r[n2]*r[n2];    
-            }else{
-                rSum2 += r[n2]*r[n2];
-            }
-        }   
-    }
+    auto rSum2 = calculatePositionSumSquared();
 
-    interactionPart = computeInteractionPartOfDoubleDerivative(particles);
+    interactionPart = computeInteractionPartOfDoubleDerivative();
     
     return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2) + interactionPart;
 }
 
-std::vector<double> SimpleGaussianInteraction::computeDerivative(int particleIndex, std::vector<class Particle*> particles){
+std::vector<double> SimpleGaussianInteraction::computeDerivative(int particleIndex){
     
     int                     numberOfDimensions          = m_system->getNumberOfDimensions();
     double                  phiPart                     = 0;
     std::vector <double>    vectorWithInteraction       (numberOfDimensions);
-    
+    std::vector <double>    uTotalDerivative            (numberOfDimensions);
+    double uDerivative                                  = 0;
+    double a = m_system->getHardCoreDiameter();
 
-        auto uDerivative = computeDerivativeOfu(particles, particleIndex);
-        auto r = particles[particleIndex]->getPosition();
+    auto m_particles = m_system->getParticles();
 
-        for (int n8=0; n8<numberOfDimensions; n8++){
-            if (n8 == 2){
-                phiPart = -2*getParameters()[0]*r[n8]*m_beta;
+    auto ri = m_particles[particleIndex]->getPosition();
+
+    auto theDifferences = getDistances(m_particles)[particleIndex];
+
+    for (int n9 = 0; n9< (int) theDifferences.size(); n9++){
+        auto rLength = theDifferences[n9];
+        auto rj = m_particles[n9]->getPosition();
+
+        if (n9 != particleIndex){
+            if (rLength <= a){
+                uDerivative = -1e50;
+                std::cout << "r_ij < a in computeDerivative" << std::endl;
             }else{
-                phiPart = -2*getParameters()[0]*r[n8];
+                uDerivative = -a/(a*rLength-rLength*rLength);
             }
-            vectorWithInteraction[n8] = phiPart + uDerivative[n8];
-        }
 
-    return vectorWithInteraction;
-}
-
-double SimpleGaussianInteraction::computeAlphaDerivative(std::vector<class Particle*> particles){
-
-    double vectorSumSquared;
-
-    for (int i10 = 0; i10<m_system->getNumberOfParticles();i10++){
-        auto r = particles[i10]->getPosition();
-        for (int n10=0; n10<m_system->getNumberOfDimensions(); n10++){
-            if (n10 == 2){
-                vectorSumSquared += m_beta*r[n10]*r[n10];
-            }else{
-                vectorSumSquared += r[n10]*r[n10];
+            for (int l3 = 0; l3<numberOfDimensions; l3++){
+                uTotalDerivative[l3] += ((ri[l3]-rj[l3])/rLength)*uDerivative;
             }
         }
     }
 
-    return (-1)*vectorSumSquared;
+    for (int n8=0; n8<numberOfDimensions; n8++){
+        if (n8 == 2){
+            phiPart = -2*getParameters()[0]*ri[n8]*m_beta;
+        }else{
+            phiPart = -2*getParameters()[0]*ri[n8];
+        }
+        vectorWithInteraction[n8] = phiPart + uTotalDerivative[n8];
+    }
+
+    return vectorWithInteraction;
+}
+
+double SimpleGaussianInteraction::computeAlphaDerivative(){
+    auto m_particles = m_system->getParticles();
+
+    auto vectorSumSquared =  calculatePositionSumSquared();
+
+    return (-1)*vectorSumSquared; // No interaction part because it is divided away.
 
 }
 
-double SimpleGaussianInteraction::computeInteractionPartOfDoubleDerivative(std::vector<class Particle*> particles){
 
-    double      firstTerm, secondTerm, thirdTerm;
+double SimpleGaussianInteraction::computeInteractionPartOfDoubleDerivative(){
+
+    double      firstTerm = 0; double secondTerm = 0; double thirdTerm = 0;
     int         numberOfParticles = m_system->getNumberOfParticles();
     int         numberOfDimentions = m_system->getNumberOfDimensions();
-    double      uDerivative = 1;
-    double      uDoubleDerivative = 1;
+    auto        m_particles = m_system->getParticles();
 
 
     for(int l5 = 0; l5 < numberOfParticles; l5++){ 
 
-        auto uPart = computeDerivativeOfu(particles, l5);
-        auto derivativePhi = computeDerivativeOneParticle(particles, l5);
+        auto derivativePhi = computeDerivativeOneParticle(l5);
+        auto uPart = computeDerivativeOfu(l5);
 
         for (int l4 = 0; l4<numberOfDimentions; l4++){
             firstTerm += derivativePhi[l4]*uPart[l4];
@@ -173,7 +167,7 @@ double SimpleGaussianInteraction::computeInteractionPartOfDoubleDerivative(std::
     return 2*firstTerm + secondTerm + thirdTerm;
 }
 
-std::vector <double> SimpleGaussianInteraction::computeDerivativeOfu(std::vector<class Particle*> particles, int particleNumber){
+std::vector <double> SimpleGaussianInteraction::computeDerivativeOfu(int particleNumber){
 
     int                     numberOfParticles       = m_system->getNumberOfParticles();
     int                     numberOfDimentions      = m_system->getNumberOfDimensions();
@@ -184,13 +178,14 @@ std::vector <double> SimpleGaussianInteraction::computeDerivativeOfu(std::vector
     std::vector <double>    uTotalDerivative        (numberOfDimentions);
     std::vector <double>    uAllStuff               (numberOfDimentions+1);
 
-    auto ri         = particles[particleNumber]->getPosition();                              // (x_i, y_i, z_i)
-    auto difference = getDistances(particles)[particleNumber];
+    auto m_particles = m_system->getParticles();
+    auto ri         = m_particles[particleNumber]->getPosition();                              // (x_i, y_i, z_i)
+    auto difference = getDistances(m_particles)[particleNumber];
     
 
     for (int l1 = 0; l1 < numberOfParticles; l1++){
         if (particleNumber != l1){
-            auto rj         = particles[l1]->getPosition();                          // (x_j, y_j, z_j)
+            auto rj         = m_particles[l1]->getPosition();                          // (x_j, y_j, z_j)
             auto rLength    = difference[l1];                                   // r_ij
     
             /* Here sum u'(r_ij) is determined based on the relationship 
@@ -224,12 +219,13 @@ std::vector <double> SimpleGaussianInteraction::computeDerivativeOfu(std::vector
     return uAllStuff;
 }
 
-std::vector<double> SimpleGaussianInteraction::computeDerivativeOneParticle(std::vector<class Particle*> particles, int particleIndex){
+std::vector<double> SimpleGaussianInteraction::computeDerivativeOneParticle(int particleIndex){
     
     int                 numberOfDimensions          = m_system->getNumberOfDimensions();
     std::vector<double> derivativeVector            (numberOfDimensions);
+    auto m_particles = m_system->getParticles();
 
-    auto r = particles[particleIndex]->getPosition();
+    auto r = m_particles[particleIndex]->getPosition();
 
     for (int j3=0; j3<numberOfDimensions; j3++){
         if (j3 == 2){
@@ -243,27 +239,32 @@ std::vector<double> SimpleGaussianInteraction::computeDerivativeOneParticle(std:
     
 }
 
-bool SimpleGaussianInteraction::calculateInterparticleDistances(std::vector<class Particle*> particles){
-    std::vector <std::vector <double>>                distances       (m_system->getNumberOfParticles()); // a matrix of the distance between all particles 
-    std::vector <double>                              difference      (m_system->getNumberOfParticles()); // the distance between particle j and all other particles i where j>i
-    std::vector <double>                              vectorDistance  (m_system->getNumberOfDimensions()); 
+bool SimpleGaussianInteraction::calculateInterparticleDistances(std::vector <class Particle*> particles){
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    std::vector <std::vector <double>>                distances       (numberOfParticles); // a matrix of the distance between all particles 
+    std::vector <double>                              difference      (numberOfParticles); // the distance between particle j and all other particles i where j>i
+    std::vector <double>                              vectorDistance  (numberOfDimensions); 
 
     double a = m_system->getHardCoreDiameter();
     
-    int distanceCheck = 0;
-    std::vector <double> r1(m_system->getNumberOfDimensions()), r2(m_system->getNumberOfDimensions());
+    std::vector <class Particle*> m_particles = particles;
 
-    for (int k1 = 0; k1 < m_system->getNumberOfParticles(); k1++){
+    int distanceCheck = 0;
+    std::vector <double> r1(numberOfDimensions), r2(numberOfDimensions);
+
+    for (int k1 = 0; k1 < numberOfParticles; k1++){
         // std::cout << "entering loop. Particle 1 is " << k1 << std::endl;
 
-        r1 = particles[k1]->getPosition();
+        r1 = m_particles[k1]->getPosition();
         // std::cout << "got position" << std::endl;
-        for (int k2 = 0; k2 <m_system->getNumberOfParticles(); k2++){
+        for (int k2 = 0; k2 <numberOfParticles; k2++){
             // std::cout << "entering loop. Particle 2 is " << k2 << std::endl;
             // std::cout << "hence calculating: r_" << k1 << k2 << std::endl;
             if (k1 != k2){
-                r2 = particles[k2]->getPosition();
-                for (int k3 = 0; k3<m_system->getNumberOfDimensions(); k3++){
+                r2 = m_particles[k2]->getPosition();
+                for (int k3 = 0; k3<numberOfDimensions; k3++){
                     difference[k2] +=  (r1[k3]-r2[k3])*(r1[k3]-r2[k3]);              // (x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2
                 }
                 difference[k2] = sqrt(difference[k2]);                                  // sqrt((x_i-x_j)^2 + (y_i-y_j)^2 + (z_i-z_j)^2)
@@ -273,9 +274,11 @@ bool SimpleGaussianInteraction::calculateInterparticleDistances(std::vector<clas
         
 
                 if (difference[k2] < a){
-                    std::cout << "too small difference: " << difference[k2] << "<" << a << std::endl;
+                    // std::cout << "too small difference: " << difference[k2] << "<" << a << std::endl;
                     distanceCheck +=1;
                 }
+            }else{
+                difference[k2] = 0;
             }
         }
         // std::cout << "all distances are big enough" << std::endl;
@@ -314,5 +317,33 @@ std::vector<double> SimpleGaussianInteraction::evaluateDifferenceVector(){
             }
         }
     }
+
+
     return differenceVector;
+}
+
+double SimpleGaussianInteraction::calculatePositionSumSquared(){
+
+    // std::cout << "skal brukes" << std::endl;
+
+    double vectorSumSquared = 0.0;
+    auto m_particles = m_system->getParticles();
+    
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    for (int i10 = 0; i10<numberOfParticles;i10++){
+        auto r = m_particles[i10]->getPosition();
+        for (int n10=0; n10<numberOfDimensions; n10++){
+            if (n10 == 2){
+                vectorSumSquared += m_beta*r[n10]*r[n10];
+            }else{
+                vectorSumSquared += r[n10]*r[n10];
+            }
+        }
+    }
+
+    // std::cout << "vector sum:" << vectorSumSquared << std::endl;
+
+    return vectorSumSquared;
 }

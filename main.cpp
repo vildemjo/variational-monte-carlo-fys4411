@@ -30,16 +30,15 @@ int main() {
 /* The standard set-up */
 
     bool analyticOrNot       = true;
-    bool importanceOrNot     = true;
+    bool importanceOrNot     = false;
     bool allEnergiesOrNot    = true;
     int equilibration        = 1e5;          // Number of the total steps used for equilibration
-    double hardCoreDiameter  = 0.0043;
-    int numberOfDimensions   = 1;
-    int numberOfParticles    = 2;
-    int numberOfSteps        = (int) pow(2.0,19.0);
+    // double hardCoreDiameter  = 0.0043;
+    int numberOfDimensions   = 3;
+    int numberOfParticles    = 10;
+    int numberOfSteps        = (int) pow(2.0,20.0);
     double omega             = 1.0;          // Oscillator frequency.
-    double stepLength        = 0.001;          // Metropolis step length.
-    double timeStep          = 0.01;
+    double stepLength        = 0.5;          // Metropolis step length.
     int firstCriteria        = 0;            // print header in file
     double alpha             = 0.45;
     double inititalizingStep = stepLength;
@@ -49,18 +48,22 @@ int main() {
     double densityLength = 10.0;
 
     // elliptical or spherical trap (2.82843 or 1.0)
-    double beta = 2.82843;    // omega_normal^2/omega_ho^2
+    // double beta = 2.82843;    // omega_normal^2/omega_ho^2
+
+    clock_t start, end;
+    // Recording the starting clock tick.
+    start = clock();
 
 
     System* system = new System();
-    system->setHamiltonian                (new EllipticalHarmonicOscillator(system, omega, beta));
-    system->setWaveFunction               (new SimpleGaussianInteraction(system, alpha, hardCoreDiameter, beta));
-    system->setInitialState               (new GaussianDistribution(system, numberOfDimensions, 
+    system->setHamiltonian                (new HarmonicOscillator(system, omega));
+    system->setWaveFunction               (new SimpleGaussian(system, alpha));
+    system->setInitialState               (new RandomUniform(system, numberOfDimensions, 
                                                 numberOfParticles, inititalizingStep));
     system->setEquilibration              (equilibration);
     system->setAnalytical                 (analyticOrNot);
     system->getWaveFunction               ()->setOneBodyDensityBins(numberOfBins, densityLength);
-    system->setFileName                   ("Output/test_interaction");
+    system->setFileName                   ("Output/test_rSum");
     system->runMetropolisSteps            (numberOfSteps, firstCriteria, importanceOrNot, 
                                                             allEnergiesOrNot, stepLength);
 
@@ -68,6 +71,10 @@ int main() {
 
     cout << "energy: " << system->getSampler()->getEnergy()/((double) numberOfParticles*numberOfDimensions) << endl;
     cout << "should be: " << 0.5*alpha + 1/(8.0*alpha) << endl;
+
+    end = clock();
+    double time_taken = double(end - start) / double(CLOCKS_PER_SEC); 
+    cout << "CPU time: " << time_taken << " seconds" << endl;
 
 
 

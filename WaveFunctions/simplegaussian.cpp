@@ -15,26 +15,15 @@ SimpleGaussian::SimpleGaussian(System* system, double alpha) :
     m_parameters.push_back(alpha);
 }
 
-double SimpleGaussian::evaluate(std::vector<class Particle*> particles) {
+double SimpleGaussian::evaluate() {
 
-    double rSum = 0.0;
-    
-    int numberOfParticles = m_system->getNumberOfParticles();
-    int numberOfDimensions = m_system->getNumberOfDimensions();
+    auto rSum2 = calculatePositionSumSquared();
 
-    for(int i1=0; i1<numberOfParticles; i1++){
-        auto r = particles[i1]->getPosition();
-        
-        for(int n1=0; n1<numberOfDimensions; n1++){
-            rSum += r[n1]*r[n1];
-        }
-    }
-
-    return exp(-m_parameters[0]*rSum);
+    return exp(-m_parameters[0]*rSum2);
 
 }
 
-double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> particles) {
+double SimpleGaussian::computeDoubleDerivative() {
     /* All wave functions need to implement this function, so you need to
      * find the double derivative analytically. Note that by double derivative,
      * we actually mean the sum of the Laplacians with respect to the
@@ -46,27 +35,20 @@ double SimpleGaussian::computeDoubleDerivative(std::vector<class Particle*> part
 
     int         numberOfParticles   = m_system->getNumberOfParticles();
     int         numberOfDimensions  = m_system->getNumberOfDimensions();
-    double      rSum2               = 0.0;
 
-    particles = m_system->getParticles();
-
-    for(int i2=0; i2<numberOfParticles; i2++){
-        auto r = particles[i2]->getPosition();
-        for(int n2=0; n2<numberOfDimensions; n2++){
-            rSum2 += r[n2]*r[n2];
-        }   
-    }
+    auto rSum2 = calculatePositionSumSquared(); 
     
     return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2);
 }
 
-std::vector<double> SimpleGaussian::computeDerivative(int particleIndex, std::vector<class Particle*> particles){
+std::vector<double> SimpleGaussian::computeDerivative(int particleIndex){
     
     int numberOfDimensions = m_system->getNumberOfDimensions();
+    auto m_particles = m_system->getParticles();
 
     std::vector<double> vectorSum(numberOfDimensions);
 
-    auto r = particles[particleIndex]->getPosition();
+    auto r = m_particles[particleIndex]->getPosition();
 
     for (int n8=0; n8<numberOfDimensions; n8++){
         vectorSum[n8] = -2*getParameters()[0]*r[n8];
@@ -76,16 +58,9 @@ std::vector<double> SimpleGaussian::computeDerivative(int particleIndex, std::ve
 
 }
 
-double SimpleGaussian::computeAlphaDerivative(std::vector<class Particle*> particles){
+double SimpleGaussian::computeAlphaDerivative(){
 
-    double vectorSumSquared;
-
-    for (int i10 = 0; i10<m_system->getNumberOfParticles();i10++){
-        auto r = particles[i10]->getPosition();
-        for (int n10=0; n10<m_system->getNumberOfDimensions(); n10++){
-                vectorSumSquared += r[n10]*r[n10];
-        }
-    }
+    auto vectorSumSquared = calculatePositionSumSquared();
 
     return (-1)*vectorSumSquared;
 

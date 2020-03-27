@@ -31,6 +31,5 @@ private:
     int     m_numberOfCyclesIncluded = 0;
     int     m_firstCriteria = 1;
     std::vector <double> m_localEnergyVector = std::vector <double>();
-    bool    m_printOrNot;
     class System* m_system = nullptr;
 };

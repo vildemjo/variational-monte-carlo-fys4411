@@ -4,9 +4,9 @@
 class SimpleGaussian : public WaveFunction {
 public:
     SimpleGaussian(class System* system, double alpha);
-    double evaluate(std::vector<class Particle*> particles);
-    double computeDoubleDerivative(std::vector<class Particle*> particles);
-    std::vector<double> computeDerivative(int particleIndex, std::vector<class Particle*> particles);
-    double computeAlphaDerivative(std::vector<class Particle*> particles);
-    bool getDistanceCheck(std::vector<class Particle*> particles){ return true; };
+    double evaluate();
+    double computeDoubleDerivative();
+    std::vector<double> computeDerivative(int particleIndex);
+    double computeAlphaDerivative();
+    bool getDistanceCheck(std::vector <class Particle*> particles){ return true; };
 };

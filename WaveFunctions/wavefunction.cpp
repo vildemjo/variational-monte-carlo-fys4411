@@ -35,8 +35,10 @@ void WaveFunction::setOneBodyDensityBins(int numberOfBins, double densityLength)
 
 }
 
-void WaveFunction::updateOneBodyDensity(std::vector<class Particle*> particles){
+void WaveFunction::updateOneBodyDensity(){
     
+    auto m_particles = m_system->getParticles();
+
     int numberOfParticles = m_system->getNumberOfParticles();
     int numberOfDimensions = m_system->getNumberOfDimensions();
 
@@ -50,7 +52,7 @@ void WaveFunction::updateOneBodyDensity(std::vector<class Particle*> particles){
 
     for (int l = 0; l < numberOfParticles; l++){
 
-        auto r = particles[l]->getPosition();
+        auto r = m_particles[l]->getPosition();
 
         for (int j3 = 0; j3 < numberOfDimensions; j3++){
                 // std::cout << "r is: " << r[j3] << std::endl;
@@ -73,4 +75,25 @@ void WaveFunction::updateOneBodyDensity(std::vector<class Particle*> particles){
             }
         }
     }
+}
+
+double WaveFunction::calculatePositionSumSquared(){
+
+    // std::cout << "skal ikke brukes" << std::endl;
+
+    double rSum = 0.0;
+    auto m_particles = m_system->getParticles();
+    
+    int numberOfParticles = m_system->getNumberOfParticles();
+    int numberOfDimensions = m_system->getNumberOfDimensions();
+
+    for(int i1=0; i1<numberOfParticles; i1++){
+        auto r = m_particles[i1]->getPosition();
+        
+        for(int n1=0; n1<numberOfDimensions; n1++){
+            rSum += r[n1]*r[n1];
+        }
+    }
+
+    return rSum;
 }

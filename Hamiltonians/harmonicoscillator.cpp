@@ -26,8 +26,8 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     double rSum2 = 0.0;
     double doubleDerivative = 0.0;
 
-    double kineticEnergy;
-    double potentialEnergy;
+    double kineticEnergy = 0;
+    double potentialEnergy = 0;
 
     particles = m_system->getParticles();
 
@@ -47,7 +47,7 @@ double HarmonicOscillator::computeLocalEnergy(std::vector<Particle*> particles) 
     potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
     if (m_system->getAnalytical() == true){
-        doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative(particles);
+        doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative();
     }else{
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
@@ -63,7 +63,7 @@ std::vector<double> HarmonicOscillator::computeQuantumForce(int particleIndex, s
     /* This function calculates the quantum force/drift force with is used for importance
         sampling. The quantum force is given by the derivative of the wavefunction. */
     
-     auto derivative = m_system->getWaveFunction()->computeDerivative(particleIndex, particles);
+     auto derivative = m_system->getWaveFunction()->computeDerivative(particleIndex);
 
     for (int m=0;m<m_system->getNumberOfDimensions();m++){
         derivative[m] *= 2;

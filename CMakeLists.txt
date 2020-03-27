@@ -1,4 +1,4 @@
-
+cmake_minimum_required(VERSION 3.10)
 
 project(project_1_fys4411)
 
@@ -34,8 +34,8 @@ file(
 # Create executable called "vmc"
 add_executable(vmc ${SOURCES})
 
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(vmc PUBLIC OpenMP::OpenMP_CXX)
-endif()
+# find_package(OpenMP)
+# if(OpenMP_CXX_FOUND)
+#     target_link_libraries(vmc PUBLIC OpenMP::OpenMP_CXX)
+# endif()
 

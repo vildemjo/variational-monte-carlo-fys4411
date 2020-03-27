@@ -33,15 +33,15 @@ void Sampler::sample(bool acceptedStep) {
      */
     
     // Sampling if the equilibrium stage is passed
-    double localEnergy;
+    double localEnergy = 0;
 
     if (m_stepNumber > m_system->getEquilibration()){
         if (acceptedStep == 1) { m_numberOfAcceptedSteps += 1; }
         localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
         m_cumulativeEnergy  += localEnergy;
         m_cumulativeEnergySquared += localEnergy*localEnergy;
-        m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
-        m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+        m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->computeAlphaDerivative();
+        m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative();
     }
 
     m_stepNumber++;
@@ -62,20 +62,19 @@ void Sampler::sampleAllEnergies(bool acceptedStep) {
      */
     
     // Sampling if the equilibrium stage is passed
-    
+
         if (m_stepNumber >= m_system->getEquilibration()){
             if (acceptedStep == 1) { m_numberOfAcceptedSteps += 1; }
 
-            m_system->getWaveFunction()->updateOneBodyDensity(m_system->getParticles());
+            m_system->getWaveFunction()->updateOneBodyDensity();
             double localEnergy = m_system->getHamiltonian()->computeLocalEnergy(m_system->getParticles());
-            
             
             m_cumulativeEnergy  += localEnergy;
             m_localEnergyVector.push_back(localEnergy);
             m_cumulativeEnergySquared += localEnergy*localEnergy;
             m_cumulativeEnergyDerivative += localEnergy*m_system->getWaveFunction()->
-                                            computeAlphaDerivative(m_system->getParticles());
-            m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative(m_system->getParticles());
+                                            computeAlphaDerivative();
+            m_cumulativeAlphaDerivative += m_system->getWaveFunction()->computeAlphaDerivative();
            
         }
 
@@ -117,7 +116,6 @@ void Sampler::printOutputToEnergyAlphaFile(){
     int     np = m_system->getNumberOfParticles();
     int     nd = m_system->getNumberOfDimensions();
     int     ms = m_system->getNumberOfMetropolisSteps();
-    int     p  = m_system->getWaveFunction()->getNumberOfParameters();
     double  ef = m_system->getEquilibration();
 
     ofstream myfile;
@@ -162,7 +160,11 @@ void Sampler::printOutputToEnergyFile(){
 
     myfile.open (filename, ios::out | ios::trunc);
 
-    for (int n3 = 0; n3<m_localEnergyVector.size(); n3++){
+    myfile << " # mean: " << m_energy << "\n";
+    myfile << " # std: " << "sqrt(" << m_energySquared << " - " << m_energy << "^2) = " << sqrt(m_energySquared - m_energy*m_energy) << "\n";
+
+
+    for (int n3 = 0; n3<(int) m_localEnergyVector.size(); n3++){
         myfile << m_localEnergyVector[n3] << "\n";
     }
     myfile.close();
@@ -179,11 +181,12 @@ void Sampler::printOneBodyDensityToFile(){
 
     myfile.open (filename, ios::out | ios::trunc);
 
+    int numberOfParticles = (double) m_system->getNumberOfParticles();
 
-    for (int n5 = 0; n5 < oneBodyDensity[0].size(); n5++){
+    for (int n5 = 0; n5 < (int)oneBodyDensity[0].size(); n5++){
         myfile << oneBodyDensity[0][n5] << "\t";
         for (int m5 = 1; m5 < m_system->getNumberOfDimensions()+1; m5++){
-            myfile << oneBodyDensity[m5][n5]/((double) m_numberOfCyclesIncluded) << "\t";
+            myfile << oneBodyDensity[m5][n5]/((double) m_numberOfCyclesIncluded*(double) numberOfParticles) << "\t";
         }
         myfile << "\n";
     }
@@ -201,8 +204,11 @@ void Sampler::computeAverages() {
 
     cout << "number of cycles: " << m_numberOfCyclesIncluded << endl;
 
-    m_energy = m_cumulativeEnergy / m_numberOfCyclesIncluded;
-    m_energySquared = m_cumulativeEnergySquared / m_numberOfCyclesIncluded;
+    m_energy = (m_cumulativeEnergy / (double) m_numberOfCyclesIncluded);
+    m_energySquared = m_cumulativeEnergySquared / (double) m_numberOfCyclesIncluded;
+
+    cout << "energySquared = " << m_cumulativeEnergySquared << " / " << m_numberOfCyclesIncluded << endl;
+
     m_derivative = 2* m_cumulativeEnergyDerivative / (double) m_numberOfCyclesIncluded
                     - 2*(m_cumulativeAlphaDerivative / (double) m_numberOfCyclesIncluded)*m_energy;
 }

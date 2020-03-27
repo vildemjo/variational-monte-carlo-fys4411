@@ -44,7 +44,7 @@ void GaussianDistribution::setupInitialState() {
             // cout << "distance: " << sqrt(setPos[0]*setPos[0] + setPos[1]*setPos[1] + setPos[2]*setPos[2]) << endl;
 
             for (int m4=0; m4 < m_numberOfDimensions; m4++) {
-                position.push_back(m_stepLength*Random::nextGaussian(0,1)*sqrt(m_stepLength));
+                position.push_back(Random::nextGaussian(0,1)*sqrt(m_stepLength));
             }
 
             m_particles.push_back(new Particle());
