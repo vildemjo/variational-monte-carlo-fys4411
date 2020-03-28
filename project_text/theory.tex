@@ -51,7 +51,7 @@ The two-body collisions are modelled as a pair-wise, repulsive potential
  \end{array}
  \end{equation}
 where $a$ is the hard-core diameter of the bosons. This interaction potential results in the function
- \begin{equation}
+ \begin{equation}\label{eq:interaction_term}
     f(a,|\mathbf{r}_i-\mathbf{r}_j|)=\Bigg\{
  \begin{array}{ll}
 	 0 & {|\mathbf{r}_i-\mathbf{r}_j|} \leq {a}\\
@@ -130,7 +130,9 @@ which is the same as the heat equation and Fick's second law with the inclusion 
 $$  \frac{\partial T}{\partial t} = 0 \implies 0 = \sum_i D \frac{\partial}{\partial x_i} \mathbf{e}_i \left( \frac{\partial}{\partial x_i} \mathbf{e}_i - \mathbf{F}_i\right) T $$
 for several dimensions. From this we find the drift force to be 
 
-$$ \mathbf{F} = 2 \frac{1}{\Psi_T} \nabla\Psi_T $$
+\begin{equation}\label{eq:drift_force}
+\mathbf{F} = 2 \frac{1}{\Psi_T} \nabla\Psi_T
+\end{equation}
 
 With importance sampling we use the drift force to move the particles to a position, i.e. a state, which has a higher probability, $P = |\Psi|^2$, and we also use it to change the way we accept the moves. 
 
@@ -161,16 +163,18 @@ $$ \alpha_{k+1} =  \alpha_k - \left(\frac{\partial^2 \left<E_L(\alpha_k)\right>}
 
 We need to calculate the double derivative of the expectation value of the local energy, but this expression is difficult to and might involve many integrals which are expensicve to calculate numerically. Therefore we used methods that approximate the double derivative. 
 
-\subsubsection{Simple gradient descent}
+\subsubsection{Simple gradient descent}\label{sec:gradient}
 The simplest gradient descent method use Newton-Raphson's root-finding algorithm, but approximate the inverse of the double derivative with a constant, $\gamma$. Then we have the expression
 $$ \alpha_{k+1} =  \alpha_k - \gamma \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha}. $$
 With this method the value for $\gamma$ is found from trial and error.
 
-\subsubsection{Utilizing previous gradients}
+\subsubsection{Utilizing previous gradients}\label{sec:gradient2}
 
 Another simple method which also include the previously calculated gradient gives this expression for the next approximation for $\alpha$.
-$$  \alpha_{k+1} =  \alpha_k - \tilde{\gamma} (1-\beta) \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} - \beta \frac{\partial \left<E_L(\alpha_{k-1})\right>}{\partial \alpha}  $$
-Here we can choose how much weight we want to give the previous gradient by adjusting this new constant $\beta$. An optimal value of $\tilde{\gamma}$ has to be found just as $\gamma$ had to be in the simpler version.
+$$  \alpha_{k+1} =  \alpha_k - \tilde{\gamma} (1-\lambda) \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} - \lambda \frac{\partial \left<E_L(\alpha_{k-1})\right>}{\partial \alpha}  $$
+Here we can choose how much weight we want to give the previous gradient by adjusting this new constant $\lambda$. An optimal value of $\tilde{\gamma}$ has to be found just as $\gamma$ had to be in the simpler version.
+
+\textit{Add something about how to find the gradient!}
 
 \subsection{Statistical analysis and resampling}
 

@@ -19,7 +19,6 @@ private:
     bool calculateInterparticleDistances(std::vector <class Particle*> particles);
     void setDistances(std::vector<std::vector<double>> distances);
     void updateDistances(int particleNumber);
-    std::vector<double> evaluateDifferenceVector();
     std::vector<std::vector<double>> getDistances(std::vector <class Particle*> particles) {
         calculateInterparticleDistances(particles);
         return m_distances; }

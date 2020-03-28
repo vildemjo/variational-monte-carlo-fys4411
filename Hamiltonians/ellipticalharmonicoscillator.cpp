@@ -51,11 +51,19 @@ double EllipticalHarmonicOscillator::computeLocalEnergy(std::vector<Particle*> p
 
     potentialEnergy = 0.5*m*m_omega*m_omega*rSum2;
 
+    // if (m_system->getSteps() == 4533+(int)1e5 || m_system->getSteps() == 4532+(int)1e5){
+    //     std::cout << "potentialEnergy: " << potentialEnergy << std::endl;
+    // }
+
     if (m_system->getAnalytical() == true){
         doubleDerivative = m_system->getWaveFunction()->computeDoubleDerivative();
     }else{
         doubleDerivative = computeDoubleDerivativeNumerically(particles);
     }
+
+    // if (m_system->getSteps() >= 4532+(int)1e5-10 && m_system->getSteps() <= 4532+(int)1e5+10){
+    //     std::cout << "doubleDerivative: " << doubleDerivative << "  (step: " << m_system->getSteps()-1e5 << ")" << std::endl;
+    // }
 
     kineticEnergy = -0.5*(hbar*hbar/m)*doubleDerivative;
 

@@ -23,7 +23,10 @@ using the chain rule.
 
 The interaction part is a little more complicated. We start with
 $$ \nabla_k\Psi_{in} = \nabla_k  \exp{\left(\sum_{j<i}u(r_{ji})\right)} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k}  u\left(r_{kl}\right) \nabla_k u (r_{kl}) $$. Because it is an exponential function we have to multiply the original function with the sum over all the terms in the exponent that are dependant on the particle $k$. Because $u(r_{kj}) = u(r_{jk})$ this sum is $\sum^N_{l \neq k}  u\left(r_{kl}\right)$. In addition we have to multiply with the derivative of $u(r_{kl})$ because of the chain rule. Since we have a sort of simplified way of showing the derivative (using the operator $\nabla_k$), the expression $u(r_{kj})\nabla_k u(r_{kj}) = \nabla_k u(r_{kj})$ by using the chain rule the opposite way. We then have the expression
-$$ \nabla_k\Psi_{in} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k} \nabla_k u (r_{kl}) = \sum^N_{l \neq k} \nabla_k u (r_{kl}) \Psi_{in}$$
+
+\begin{equation}\label{eq:psi_in_derivative}
+\nabla_k\Psi_{in} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l \neq k} \nabla_k u (r_{kl}) = \sum^N_{l \neq k} \nabla_k u (r_{kl}) \Psi_{in}
+\end{equation}
 for the derivative of the interaction part of the wave function.
 
 The total expression of the derivative of the trial wave function is hence 
@@ -85,17 +88,93 @@ Incerting it all into Eq. \ref{eq:double_derivative_start} and dividing by the t
    + \sum_{l\ne k}\left( u''(r_{kl})+\frac{2}{r_{kl}}u'(r_{kl})\right).
 \end{align*}
 
-\subsection{Local energy}
+\section{The local energy and drift force as implemented in the code}\label{sec:implementation}
 
-To calculate the kinetic energy part of the local energy we use the last expression in the previous section, sum over all particles $k$. We use $\phi(\mathbf{r}_k)$ from Eq. \ref{eq:phi} and find 
+To calculate the kinetic energy part of the local energy we use the last expression in the previous section, summed over all particles $k$. We use $\phi(\mathbf{r}_k)$ from Eq. \ref{eq:phi} and find 
 
-$$ \sum_k^N\frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha Nd + 4 \alpha^2 \sum_k^N \mathbf{r}_k^2 $$ where $d$ is the number of dimensions and $\mathbf{r}_k^2 = x_k^2 + y_k^2+\beta z_k^2$. (This is the expression for the kinetic part of the local energy if there is no interaction.) Furthermore,
+$$ \sum_k^N\frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha Nd + 4 \alpha^2 \sum_k^N \mathbf{r}_k^2 $$ where $d$ is the number of dimensions and $\mathbf{r}_k^2 = x_k^2 + y_k^2+\beta z_k^2$. This is the expression for the kinetic part of the local energy if there is no interaction. Furthermore, from Eq. \ref{eq:phi} and Eq. \ref{eq:psi_ob_derivative}
 
-$$ \sum_k^N\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha  \mathbf{r}_k. $$ 
+$$ \frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} = -2\alpha  \mathbf{r}_k $$
+ 
 We also have
 \begin{align*}
 u'(r_{kl}) &= -\frac{a}{ar_{kl}-r_{kl}^2} \text{ and }\\
 u''(r_{kl}) ) &= \frac{a(a-2r_{kl})}{r_{kl}^2(a-r_{kl})^2}
-\end{align*} for $r_{kl} > a$. The other case is not relevant because the local energy is never sampled if $r_{kl} < a$. Then the wave equation is zero. With this the local energy can be calculated analytically.
+\end{align*} for $r_{kl} > a$. The other case is not relevant because the local energy is never sampled if $r_{kl} < a$. Then the wave equation is zero. With this the kinetic part of the local energy can be calculated analytically with our choice of trial wavefunction.
 
-To get the potential energy part of the local energy the sum over all particles $k$ is made with the relevant expression for the trap from Eq. \ref{eq:trap_eqn}. THis is done for both the analytical and the numerical evaluation of the local energy.
+To get the potential energy part of the local energy the sum over all particles $k$ is made with the relevant expression for the trap from Eq. \ref{eq:trap_eqn}. This is done for both the analytical and the numerical evaluation of the local energy.
+
+The drift force, $F$, given by Eq. \ref{eq:drift_force} and by extracting the relevant expressions from the equations above we get
+$$ F(\mathbf{r}_k) = 2\left(\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
+   +\sum_{l\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)}{r_{kl}}u'(r_{kl})\right) = 2 \left( -2\alpha  \mathbf{r}_k  - \sum_{l\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)}{r_{kl}}\frac{a}{ar_{kl}-r_{kl}^2}\right) $$ 
+where the last term in the paranthesis is removed when there is no interaction.
+
+
+\subsection{Brute force sampling calculations of the energy with various $\alpha$ and number of particles}\label{app:alpha_lists_brute_force}
+
+\begin{table}[H]\caption{50 particles}\label{tab:brute_force_N_50}
+\begin{tabular}{lllll}
+$\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
+0.35 & 79.49535 & 79.82143 & 0.23481 & 2.97403\\
+0.40 & 77.08187 & 76.87500 & 0.12685 & 1.94938\\
+0.45 & 75.34621 & 75.41667 & 0.05503 & 0.88031\\
+0.50 & 75.00000 & 75.00000 &                &                \\ 
+0.55 & 75.20971 & 75.34091 & 0.05544 & 0.86965\\
+0.60 & 76.10958 & 76.25000 & 0.09233 & 1.57130\\
+0.65 & 77.71489 & 77.59615 & 0.13609 & 2.33112\\
+\end{tabular}
+\end{table} 
+
+\begin{table}[H]\caption{100 particles}\label{tab:brute_force_N_100}
+\begin{tabular}{lllll}
+$\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
+0.35 & 160.41867 & 159.64286 & 0.42227 & 4.47971\\
+0.40 & 153.99383 & 153.75000 & 0.25800 & 2.78924\\
+0.45 & 150.84608 & 150.83333 & 0.08956 & 1.23005\\
+0.50 & 150.00000 & 150.00000 &                 &                \\ 
+0.55 & 150.67186 & 150.68182 & 0.11373 & 1.26926\\
+0.60 & 152.53009 & 152.50000 & 0.18938 & 2.15082\\
+0.65 & 155.05236 & 155.19231 & 0.24124 & 2.99347\\
+\end{tabular}
+\end{table} 
+
+\begin{table}[H]\caption{500 particles}\label{tab:brute_force_N_500}
+\begin{tabular}{lllll}
+$\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
+0.35 & 790.86683 & 798.21429 & 0.42590 & 4.30332\\
+0.40 & 762.88550 & 768.75000 & 0.40947 & 3.79362\\
+0.45 & 751.76787 & 754.16667 & 0.14928 & 1.47760\\
+0.50 & 750.00000 & 750.00000 &                 &                \\ 
+0.55 & 755.78734 & 753.40909 & 0.13751 & 1.38974\\
+0.60 & 766.83482 & 762.50000 & 0.23418 & 2.49695\\
+0.65 & 782.69730 & 775.96154 & 0.42778 & 4.21930\\
+\end{tabular}
+\end{table} 
+
+\begin{table}[H]\caption{The calculated energies, $\left<E_L\right>$, for one particle in three dimensions compared with the exact energy, $E_{ex}$. Both energies are of units $\hbar\omega_{oh}$. These calculations were performed with $2^{24}$ number of MC cycles. The normal standard deviation $\sigma$, and the variance from the blocking resampling method, $\sigma_B$ are also included. }\label{tab:brute_force_N_1_MC_boost}
+\center
+\begin{tabular}{cccccc}
+$\alpha$ & $\left< E_L \right>$ & $E_{ex}$ & |$\left< E_L \right>-E_{ex}$|  & $\sigma_B$ & $\sigma$\\ \hline
+0.35 & 1.59627 & 1.59643 & 0.00016 & 0.00552 & 0.44298\\
+0.40 & 1.53763 & 1.53750 & 0.00013 & 0.00333 & 0.27608\\
+0.45 & 1.50793 & 1.50833 & 0.00040 & 0.00138 & 0.12657\\
+0.50 & 1.50000 & 1.50000 &                &                &                 \\
+0.55 & 1.50516 & 1.50682 & 0.00165 & 0.00119 & 0.11845\\
+0.60 & 1.52413 & 1.52500 & 0.00087 & 0.00226 & 0.22636\\
+0.65 & 1.54415 & 1.55192 & 0.00777 & 0.00328 & 0.32873\\
+\end{tabular}
+\end{table} 
+
+\begin{table}[H]\caption{The calculated energies, $\left<E_L\right>$, for ten particle in three dimensions compared with the exact energy, $E_{ex}$. Both energies are of units $\hbar\omega_{oh}$. These calculations were performed with $2^{24}$ number of MC cycles. The normal standard deviation, $\sigma$, and the standard deviation from the blocking resampling method, $\sigma_B$ are also included.}\label{tab:brute_force_N_10_MC_boost}
+\center
+\begin{tabular}{cccccc}
+$\alpha$ & $\left< E_L \right>$ & $E_{ex}$ & |$\left< E_L \right>-E_{ex}$|  & $\sigma_B$ & $\sigma$\\ \hline
+0.35 & 15.85498 & 15.96429 & 0.10931 & 0.04753 & 1.35679\\
+0.40 & 15.43695 & 15.37500 & 0.06195 & 0.03140 & 0.89352\\
+0.45 & 15.10239 & 15.08333 & 0.01906 & 0.01406 & 0.41717\\
+0.50 & 15.00000 & 15.00000 &                &                &                \\
+0.55 & 15.05625 & 15.06818 & 0.01193 & 0.01224 & 0.37645\\
+0.60 & 15.19959 & 15.25000 & 0.05041 & 0.02301 & 0.71856\\
+0.65 & 15.58399 & 15.51923 & 0.06476 & 0.02798 & 1.02971\\
+\end{tabular}
+\end{table} 
