@@ -12,6 +12,7 @@ WaveFunction::WaveFunction(System* system) {
 void WaveFunction::setOneBodyDensityBins(int numberOfBins, double densityLength){
     m_densityLength = densityLength;
 
+    // Making sure that the sum of positive and negative values are correct
     if (numberOfBins % 2 == 0){
         m_numberOfBins = numberOfBins;
     }else{
@@ -36,6 +37,7 @@ void WaveFunction::setOneBodyDensityBins(int numberOfBins, double densityLength)
 }
 
 void WaveFunction::updateOneBodyDensity(){
+    /* This function collects the data needed to get the the one-body density.*/
     
     auto m_particles = m_system->getParticles();
 
@@ -44,42 +46,35 @@ void WaveFunction::updateOneBodyDensity(){
 
     double binLength = m_densityLength/(double) m_numberOfBins;
 
-    // std::cout << "number of bins: " << m_numberOfBins << std::endl;
-    // std::cout << "length of bins: " << m_oneBodyDensity[0].size() << std::endl;
-
-    // std::cout << "check bin place: " << m_oneBodyDensity[0][302] << std::endl;
-
 
     for (int l = 0; l < numberOfParticles; l++){
 
         auto r = m_particles[l]->getPosition();
 
         for (int j3 = 0; j3 < numberOfDimensions; j3++){
-                // std::cout << "r is: " << r[j3] << std::endl;
+              
             for (int j5 = -m_numberOfBins/2; j5 < m_numberOfBins/2; j5++){
-                // std::cout << j5 << std::endl;
             
                 if (j5 < 0){
                     if (r[j3] > (j5)*binLength && r[j3] <= (j5+1)*binLength){
-                        // std::cout << "r_min: " << (j5)*binLength << " r_max: " << (j5+1)*binLength << std::endl;
+                        
                         m_oneBodyDensity[j3+1][j5+m_numberOfBins/2] += 1;
                     }
                 }else{
                     if (r[j3] >= (j5)*binLength && r[j3] < (j5+1)*binLength){
-                        // std::cout << "r_min: " << (j5)*binLength << " r_max: " << (j5+1)*binLength << std::endl;
                         m_oneBodyDensity[j3+1][j5+m_numberOfBins/2] += 1;
                     }
                 }
-                // std::cout << "this is ok. d = "<< j3 << " bin =" << j5+m_numberOfBins/2 << std::endl;
-
+               
             }
         }
     }
 }
 
 double WaveFunction::calculatePositionSumSquared(){
-
-    // std::cout << "skal ikke brukes" << std::endl;
+    /* This function calcualtes the positions squared and summed over all
+    particles. This is used in several of the functions in the SimpleGaussian 
+    class. The other have it's own to include beta.*/
 
     double rSum = 0.0;
     auto m_particles = m_system->getParticles();

@@ -208,6 +208,7 @@ Figure \ref{fig:interaction_gradient_descent_N_10} shows the result of the simpl
 \includegraphics[width=\linewidth]{../Results/gradient_descent_interaction_10p}\caption{Upper left: The development of the parameter $\alpha$ during the simple gradient descent method with $\gamma = 0.1$. In the plot the mean value, $\bar{\alpha}$, of the $\alpha$s from step 15 and to the end is showed. Upper right: The expectation energy for the system with ten particles in 3D. Lower left: The absolute value of the derivative of alpha used in the simple gradient descent method. Lower right: The derivative of alpha used in the simple gradient descent method. }\label{fig:interaction_gradient_descent_N_10}
 \end{figure}
 
+From Tab. \ref{tab:interaction_vs_not} we see that $\alpha$ seems to get smaller for larger amounts of particels when we have included interaction. And, as we have seen before, the energy is larger than the ground state when there is no interaction.
 
 \begin{table}[H]\caption{$\left<E_L\right>$ for different amount of particles in three dimensions calculated at the $\alpha$ found from the gradient descent method. Energies are of units $\hbar\omega_{oh}$. These calculations were performed with $2^{20}$ number of MC cycles. The normal standard deviation, $\sigma$, and the standard deviation from the blocking resampling method, $\sigma_B$ are also included.}\label{tab:interaction_vs_not}
 \center
@@ -216,7 +217,7 @@ Interacting particles and elliptical trap &No interaction and spherical trap\\
 \begin{tabular}{ccccc}
 N &$\alpha$ & $\left< E_L \right>$ & $\sigma_B$ & $\sigma$\\ \hline
 10 &0.495934 & 15.25500 & 0.00054 & 0.04169\\
-50 & \\
+50 &0.483195 & 81.46368 & 0.00987 & 0.31798\\ 
 \end{tabular}&
 \begin{tabular}{ccccc}
 N &$\alpha$ & $\left< E_L \right>$ & $\sigma_B$ & $\sigma$\\ \hline
@@ -234,19 +235,22 @@ $$\text{counts in bin $i$} =  \sqrt{ (\text{x$_i$-counts})^2 + (\text{y$_i$-coun
 
 At last, the counts in the bins representing the negative values where added to the bins representing the same positive values.
 
+Figure \ref{fig:one_body_density_N_50} shows the one-body density of the system with fifty particles in the elliptical potential. We oberve a small difference between the case with out without the Jastrow factor. The trap size is probably a little  big compared to the amount of particles for us to be able to observe a large difference in the density. The difference we expect is that the case with interaction is spread out compared to the other case. This is because we have a repulsive interaction between the particles. A spreading out is also what we see in the figure.
+
 \begin{figure}
 \center
-\includegraphics[width=0.7\linewidth]{../Results/one_body_density_10p}\caption{•}\label{fig:one_body_densityN_10}
+\includegraphics[width=0.7\linewidth]{../Results/one_body_density_10p}\caption{One-body denisty of a system of ten particles with and without the Jastrow factor.}\label{fig:one_body_density_N_50}
 \end{figure}
 
 \section{Concluding remarks}
-Some stuff that was not ideal:\\
-- std not good - tried to understand why - investigate it a bit\\
-- calculations for more number of particles was a bit challenging - program not fast enough - flags "-O3" did not improve it - will have to parallelize for the next project\\
-- Had some issues with importance sampling + interaction - could not find out what was wrong - plot in appendix - chose to use brute force for the interacting cases\\
-- When I found the equilibrium and number of MC cycles, I did this for only three particles in 3D and assumed that this would apply for more particles as well. This was probably not a great assumption, especially for the equilibration, since a higher number of particles probably acquire more steps to get to a steady state since we only move one particle at the time.\\
-- Chose chnage in energy to stop the gradient descent - made not good idea - could be random - used different method to find $\alpha$ later.\\
--
+
+In this project we found the ground state energy using the VMC method and we also explored different ways of making the code more compex and effective. We have implemented importance sampling and optimizing methods. To make the model more realistic, we implemented interaction and saw that this changed both the trial wavefunction and the energy in the ground state. 
+
+There are some aspects of this project that were not ideal. For example the standard deviation calculated directly from the sampled local energies were large compared to what is expected. I tried to investigate it a little bit and specifically check if it really was high or if something made it look larger than is was i.e. and outlier. 
+
+Another thing is that I only calcualted the energies and other things for maximum fifty particles in three dimensions. This was because the code was too slow to do any more. I tried to use optimizing flags etc, but they did not make the calcualtions any faster.I will definitly have to parallelize for the next project and maybe also use the supercomputer I have access to. I also had some issues with combining importance sampling and interaction. I could not find out what was wrong, so I decided to use brute force sampling for the interacting cases.
+I also notices that when I found the equilibrium and number of MC cycles, I did this for only three particles in 3D and assumed that this would apply for more particles as well. This was probably not a great assumption, especially for the equilibration, since a higher number of particles probably acquire more steps to get to a steady state since we only move one particle at the time. At last I want to comment that when I looked at different minimization rates I chose the change in energy smaller than $10^{-5}$ as a criteria to stop the gradient descent. Afterward I thought it might be a bad idea because it does not nescarily mean that it is at a steady state and it could be random. Therefore I used a  different method to find $\alpha$ later.
+
 
 % \begin{equation}
 % E_L = -\frac{\hbar^2}{2m} \sum_k^N \left( \frac{\partial^2}{\partial x_k^2} \phi(x_k,y_k,z_k)  + \frac{\partial^2}{\partial y_k^2} \phi(x_k,y_k,z_k) + \frac{\partial^2}{\partial z_k^2} \phi(x_k,y_k,z_k) \right) + \frac{1}{2}m \omega^2 \sum_k^N \left( x_k^2 + y_k^2 +z_k^2 \right)

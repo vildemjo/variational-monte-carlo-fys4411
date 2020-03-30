@@ -37,7 +37,7 @@ bool System::metropolisStep() {
 
     double newWaveFunction = m_waveFunction->evaluate();
 
-    
+    // Determening if step is accepted (return true) or not (move particle back and return false)
     if (Random::nextDouble() <= newWaveFunction*newWaveFunction
                                 /(oldWaveFunction*oldWaveFunction)){
         return true;
@@ -106,7 +106,9 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
 
     m_particles                             = m_initialState->getParticles();
     m_sampler                               = new Sampler(this);
-    m_numberOfMetropolisSteps               = numberOfMetropolisSteps + m_equilibration;
+    // The eqilibration is set to be a number of steps instead of a fraction of the steps
+    // and here it is added onto the number of steps.
+    m_numberOfMetropolisSteps               = numberOfMetropolisSteps + m_equilibration; 
     m_stepLength                            = stepLength;
     m_sampler->setNumberOfMetropolisSteps   (m_numberOfMetropolisSteps);
     m_sampler->setFileOutput                (firstCriteria);
@@ -126,6 +128,9 @@ void System::runMetropolisSteps(int numberOfMetropolisSteps, int firstCriteria, 
             acceptedStep = metropolisStep();
         }
 
+        // There are two different runs, one where the local enery in every step 
+        // is saved to file (true) and another where only the the expectation value
+        // is saved (false).
         if (getAllEnergies() == true){
             m_sampler->sampleAllEnergies(acceptedStep);
         }else{

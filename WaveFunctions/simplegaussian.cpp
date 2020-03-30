@@ -16,6 +16,7 @@ SimpleGaussian::SimpleGaussian(System* system, double alpha) :
 }
 
 double SimpleGaussian::evaluate() {
+    /* This function calculates the trial wavefunction. */
 
     auto rSum2 = calculatePositionSumSquared();
 
@@ -24,24 +25,22 @@ double SimpleGaussian::evaluate() {
 }
 
 double SimpleGaussian::computeDoubleDerivative() {
-    /* All wave functions need to implement this function, so you need to
-     * find the double derivative analytically. Note that by double derivative,
-     * we actually mean the sum of the Laplacians with respect to the
-     * coordinates of each particle.
-     *
-     * This quantity is needed to compute the (local) energy (consider the
-     * Schrödinger equation to see how the two are related).
-     */
+    /* This function calculates double derivative of the trial wavefunction
+    analytically. */
 
     int         numberOfParticles   = m_system->getNumberOfParticles();
     int         numberOfDimensions  = m_system->getNumberOfDimensions();
 
     auto rSum2 = calculatePositionSumSquared(); 
     
-    return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions + 4*m_parameters[0]*m_parameters[0]*rSum2);
+    return (-2*m_parameters[0]*numberOfParticles*numberOfDimensions 
+                        + 4*m_parameters[0]*m_parameters[0]*rSum2);
 }
 
 std::vector<double> SimpleGaussian::computeDerivative(int particleIndex){
+    /* This function calculates the derivative of the wavefunction with 
+    regards to one spesific particle. This is used to calcualte the drift
+    force used in importance sampling. */
     
     int numberOfDimensions = m_system->getNumberOfDimensions();
     auto m_particles = m_system->getParticles();
@@ -59,6 +58,9 @@ std::vector<double> SimpleGaussian::computeDerivative(int particleIndex){
 }
 
 double SimpleGaussian::computeAlphaDerivative(){
+    /* This function calculates the normalized derivative of the wavefunction 
+    with regards to the parameter alpha. This is used to perform optimization
+    by the use of gradient descent methods.*/
 
     auto vectorSumSquared = calculatePositionSumSquared();
 
