@@ -1,10 +1,10 @@
 \section{The derivatives and the local energy}
 
-In order to find the drift force and the local energy analytically we need to calcualte both the derivative and the double derivative of the trial wavefunction.
+In order to find the drift force and the local energy analytically we need to calculate both the derivative and the double derivative of the trial wavefunction.
 
 \subsection{The derivative of the trial wave function}
 
-We separete the total trial wave function (Eq. \ref{eq:trialwf}) into the onebody part and the interaction part,
+We separate the total trial wave function (Eq. \ref{eq:trialwf}) into the one-body part and the interaction part,
 \begin{equation}
 \Psi_T = \Psi_{ob}\Psi_{in}.
 \end{equation}
@@ -44,17 +44,17 @@ The double derivative with regards to particle $k$ is
 \begin{equation}\label{eq:total_double_start}
 nabla^2_k \Psi_T =  \Psi_{ob}\nabla^2_k\Psi_{in} + 2\nabla_k\Psi_{ob}\nabla_k\Psi_{in} + \Psi_{ob}\nabla^2_k\Psi_{in}.
 \end{equation}
-So we have to calculate $\nabla^2_k\Psi_{ob}$ and $\nabla^2_k\Psi_{in}$, in addition to the derivatives form the prevoius section, and insert the expressions into the equation above.
+So we have to calculate $\nabla^2_k\Psi_{ob}$ and $\nabla^2_k\Psi_{in}$, in addition to the derivatives form the previous section, and insert the expressions into the equation above.
 
 From Eq. \ref{eq:psi_ob_derivative} we find
 $$ \nabla^2_k\Psi_{ob} = \nabla^2_k \phi(\mathbf{r}_k)\prod_{k\neq i}^N \phi(\mathbf{r}_i) = \frac{\nabla^2_k \phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)} \Psi_{ob},$$
-since $\prod_{k\neq i}^N \phi(\mathbf{r}_i)$ is indepedant of the particle $k$.
+since $\prod_{k\neq i}^N \phi(\mathbf{r}_i)$ is independent of the particle $k$.
 
 For the double derivative of $\Psi_{in}$ we use the product rule again
 \begin{equation}\label{eq:double_derivative_start}
 \nabla^2_k\Psi_{in} = \exp{\left(\sum_{j<i}u(r_{ji})\right)} \nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] +\nabla_k\left[ \exp{\left(\sum_{j<i}u(r_{ji})\right)}\right] \sum^N_{l \neq k} \nabla_k u (r_{kl}).
 \end{equation}
-Here the square brakets are used to show what $\nabla_k$ applies to. So,
+Here the square brackets are used to show what $\nabla_k$ applies to. So,
 
 $$\nabla_k\left[ \exp{\left(\sum_{j<i}u(r_{ji})\right)}\right]=  \exp{\left(\sum_{j<i}u(r_{ji})\right)} \sum^N_{l' \neq k} \nabla_k u (r_{kl'})$$ as in the previous section. We calculate $ \nabla_k u(r_{kl'})$ using the chain rule and get
 $$ \nabla_k u(r_{kl'})  = \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} u'(r_{kl'}), $$ where $u'(r_{kl'}) = \frac{d}{dr_{kl'}}u(r_{kl'})$, because $$\frac{d}{d\mathbf{r}_{k}}r_{kl'} =\frac{d}{d\mathbf{r}_k}\sqrt{(x_k-x_{l'})^2 + (y_k-y_{l'})^2 + (z_k-z_{l'})^2} = \frac{\mathbf{r}_k - \mathbf{r}_{l'}}{r_{kl'}} $$ and then
@@ -64,7 +64,7 @@ Next, we have
 \begin{equation}\label{eq:double_der_part_in}
 \nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] = \nabla_k \left[ \sum^N_{l \neq k}  \Psi_{in} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl}) \right] = \sum^N_{l \neq k} \nabla_k \left[ d \cdot \frac{a}{b} \cdot c \right]
 \end{equation}
-where $a = \left(\mathbf{r}_k-\mathbf{r}_{l}\right)$, $b= r_{kl}=|\mathbf{r}_k-\mathbf{r}_{l}|$ , $c = u'(r_{kl})$ and $d = \Psi_{in}= \exp\left(\sum_{i<j}^N u(r_{ij})\right)$. Furthermore, $a' = \frac{d}{d\mathbf{r}_k} \left(\mathbf{r}_k-\mathbf{r}_{l}\right) = \frac{d}{dx_k} x_k  + \frac{d}{dy_k} y_k  +\frac{d}{dz_k} z_k   = 3$ (the number of dimensions), $b' = \frac{d}{d\mathbf{r}_k} r_{kl} = \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$, $c' = \frac{d}{d\mathbf{r}_k} u'(r_{kl}) =  u''(r_{kl})\frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$ and $d' = \Psi_{in} \sum^N_{l \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl})$. Inserting all these expression into Eq. \ref{eq:double_der_part_in} gives (skipping some of the simplifications since the explaination is in the above part)
+where $a = \left(\mathbf{r}_k-\mathbf{r}_{l}\right)$, $b= r_{kl}=|\mathbf{r}_k-\mathbf{r}_{l}|$ , $c = u'(r_{kl})$ and $d = \Psi_{in}= \exp\left(\sum_{i<j}^N u(r_{ij})\right)$. Furthermore, $a' = \frac{d}{d\mathbf{r}_k} \left(\mathbf{r}_k-\mathbf{r}_{l}\right) = \frac{d}{dx_k} x_k  + \frac{d}{dy_k} y_k  +\frac{d}{dz_k} z_k   = 3$ (the number of dimensions), $b' = \frac{d}{d\mathbf{r}_k} r_{kl} = \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$, $c' = \frac{d}{d\mathbf{r}_k} u'(r_{kl}) =  u''(r_{kl})\frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}}$ and $d' = \Psi_{in} \sum^N_{l \neq k} \frac{\mathbf{r}_k - \mathbf{r}_{l}}{r_{kl}} u'(r_{kl})$. Inserting all these expression into Eq. \ref{eq:double_der_part_in} gives (skipping some of the simplifications since the explanation is in the above part)
 \begin{align}
 \nabla_k\left[ \sum^N_{l \neq k} \nabla_k u (r_{kl})\right] &= \sum^N_{l \neq k} \left( \left(\frac{3r_{kl}}{\left(\mathbf{r}_k-\mathbf{r}_{l}\right)^2}-\frac{1}{r_{kl}}\right)u'(r_{kl}) + u''(r_{kl})\right) \frac{\left(\mathbf{r}_k-\mathbf{r}_{l}\right)^2}{r_{kl}^2} \Psi_{in} \\ \label{eq:doble_der_u}
 &= \sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{kl}) + u''(r_{kl})\right) \Psi_{in}
@@ -74,7 +74,7 @@ $$\nabla^2_k\Psi_{in} = \Psi_{in}\sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{
 
 $$\nabla^2_k\Psi_{in} = \Psi^2_{in} \left[\sum^N_{l \neq k} \left( \frac{2}{r_{kl}}u'(r_{kl}) + u''(r_{kl})\right) +   \sum^N_{l' \neq k} \sum^N_{l \neq k} \frac{(\mathbf{r}_k - \mathbf{r}_{l'})(\mathbf{r}_k - \mathbf{r}_{l})}{r_{kl'}r_{kl}}  u'(r_{kl})u'(r_{kl'}) \right] $$
 
-Incerting it all into Eq. \ref{eq:double_derivative_start} and dividing by the trial wavefunction (as we will do to find the local energy) gives
+Inserting it all into Eq. \ref{eq:double_derivative_start} and dividing by the trial wavefunction (as we will do to find the local energy) gives
 \begin{align*}
    \frac{1}{\Psi_T(\mathbf{r})}\nabla_k^2\Psi_T(\mathbf{r})
    &= \frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
@@ -107,12 +107,12 @@ To get the potential energy part of the local energy the sum over all particles 
 The drift force, $F$, given by Eq. \ref{eq:drift_force} and by extracting the relevant expressions from the equations above we get
 $$ F(\mathbf{r}_k) = 2\left(\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
    +\sum_{l\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)}{r_{kl}}u'(r_{kl})\right) = 2 \left( -2\alpha  \mathbf{r}_k  - \sum_{l\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_l)}{r_{kl}}\frac{a}{ar_{kl}-r_{kl}^2}\right) $$ 
-where the last term in the paranthesis is removed when there is no interaction.
+where the last term in the parenthesis is removed when there is no interaction.
 
-
-\subsection{Brute force sampling calculations of the energy with various $\alpha$ and number of particles}\label{app:alpha_lists_brute_force}
+\section{Brute force sampling calculations of the energy with various $\alpha$ and number of particles}\label{app:alpha_lists_brute_force}
 
 \begin{table}[H]\caption{50 particles}\label{tab:brute_force_N_50}
+\center
 \begin{tabular}{lllll}
 $\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
 0.35 & 79.49535 & 79.82143 & 0.23481 & 2.97403\\
@@ -126,6 +126,7 @@ $\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
 \end{table} 
 
 \begin{table}[H]\caption{100 particles}\label{tab:brute_force_N_100}
+\center
 \begin{tabular}{lllll}
 $\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
 0.35 & 160.41867 & 159.64286 & 0.42227 & 4.47971\\
@@ -139,6 +140,7 @@ $\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
 \end{table} 
 
 \begin{table}[H]\caption{500 particles}\label{tab:brute_force_N_500}
+\center
 \begin{tabular}{lllll}
 $\alpha$: & $\left< E_L \right>$:& $E_{exact}$ & $\sigma_B$ & $\sigma$\\ \hline
 0.35 & 790.86683 & 798.21429 & 0.42590 & 4.30332\\
@@ -178,3 +180,86 @@ $\alpha$ & $\left< E_L \right>$ & $E_{ex}$ & |$\left< E_L \right>-E_{ex}$|  & $\
 0.65 & 15.58399 & 15.51923 & 0.06476 & 0.02798 & 1.02971\\
 \end{tabular}
 \end{table} 
+
+\section{Rewriting Hamiltonian}\label{app:new_Hamiltonian}
+
+We begin with
+
+$$-\frac{\hbar^2}{2m} \nabla_i^2 \Psi + \frac{1}{2}m \omega_{ho}^2 \left( x_i^2 + y_i^2\right)\Psi + \frac{1}{2}m\omega_z^2 z_i^2\Psi = E \Psi $$
+
+Introducing unit of length as $[x]=[y]=[z] = a_{ho}$. We then get
+
+$$-\frac{\hbar^2}{2ma_{ho}^2} \nabla_i^2 \Psi + \frac{1}{2}m \omega_{ho}^2 a_{ho}^2\left( x_i^2 + y_i^2\right)\Psi + \frac{1}{2}m\omega_z^2a_{ho}^2 z_i^2\Psi = E \Psi $$
+
+We divide the whole equation by $\frac{\hbar^2}{ma_{ho}^2}$ and get
+
+$$-\frac{1}{2} \nabla_i^2 \Psi + \frac{1}{2}\frac{ma_{ho}^2}{\hbar^2}m \omega_{ho}^2 a_{ho}^2\left( x_i^2 + y_i^2\right)\Psi + \frac{1}{2}\frac{ma_{ho}^2}{\hbar^2}m\omega_z^2a_{ho}^2 z_i^2\Psi = \frac{ma_{ho}^2}{\hbar^2}E \Psi $$
+
+which is
+
+$$-\frac{1}{2} \nabla_i^2 \Psi + \frac{1}{2}\frac{1}{\hbar^2}\omega_{ho}^2 \left( x_i^2 + y_i^2\right)\Psi + \frac{1}{2}\frac{1}{\hbar^2}\omega_z^2 z_i^2\Psi = \frac{ma_{ho}^2}{\hbar^2}E \Psi $$
+
+We want the term $\frac{1}{\hbar^2} \omega_{ho}^2 $ to equal one and see that this gives
+
+$$\frac{1}{\hbar^2} \omega_{ho}^2 = 1 \implies \hbar^2 = \omega_{ho}^2$$
+
+we put this into the equation and get
+
+$$-\frac{1}{2} \nabla_i^2 \Psi + \left( x_i^2 + y_i^2\right)\Psi + \frac{\omega_{z}^2}{\omega_{ho}^2} z_i^2\Psi = \frac{ma_{ho}^2}{\hbar^2} E \Psi $$
+
+We use that $a_{ho}^2 = \nicefrac{\hbar}{m\omega_{ho}}$ and set $\gamma = \nicefrac{\omega_{z}}{\omega_{ho}}$ to get
+
+$$\frac{1}{2} \left(-\nabla_i^2 + \left( x_i^2 + y_i^2\right) + \gamma^2 z_i^2 \right)\Psi= \frac{1}{\hbar\omega_{ho}} E \Psi $$
+
+So we have the new Hamiltonian
+
+$$ \hat{H} = \frac{1}{2} \left(-\nabla_i^2 + \left( x_i^2 + y_i^2\right) + \gamma^2 z_i^2 \right)$$
+ and the energy is in units $\hbar \omega_{ho}$.
+
+\section{How to find the derivative with respect to $\alpha$}\label{app:alpha_derivative}
+
+The expectation value is given by
+
+$$ \left< E_L \right> = \frac{\left< \Psi_T | \hat{H}|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>} $$
+
+That means that the derivative with respect to $\alpha$ is given by
+
+$$\frac{\partial \left< E_L \right>}{\partial \alpha} = \frac{u'\cdot v - u\cdot v' }{v^2} $$ where
+
+$ u = \left< \Psi_T | \hat{H}|\Psi_T\right>$, $u' = \frac{\partial}{\partial \alpha}\left<\Psi_T | \hat{H}|\Psi_T\right>$, $ v= \left<\Psi_T|\Psi_T\right>$ and $v' = \frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right>$. If we insert this into the equation we get
+
+$$\frac{\partial \left< E_L \right>}{\partial \alpha} = \frac{\frac{\partial}{\partial \alpha}\left<\Psi_T | \hat{H}|\Psi_T\right>\left<\Psi_T|\Psi_T\right> - \left< \Psi_T | \hat{H}|\Psi_T\right> \frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right> }{\left<\Psi_T|\Psi_T\right>\left<\Psi_T|\Psi_T\right>}  $$ 
+
+$$ \frac{\partial \left< E_L \right>}{\partial \alpha} = \frac{\frac{\partial}{\partial \alpha}\left<\Psi_T | \hat{H}|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>}- \frac{\left< \Psi_T | \hat{H}|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>} \frac{\frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>} $$ 
+
+$$ \frac{\partial \left< E_L \right>}{\partial \alpha} = \frac{\frac{\partial}{\partial \alpha}\left<\Psi_T | \hat{H}|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>}- \left< E_L \right>\frac{\frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right>}{\left<\Psi_T|\Psi_T\right>} $$ 
+
+Further more we have that 
+
+$$ \frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right> =  \frac{\partial}{\partial \alpha}\int_{-\infty}^{\infty}\Psi_T^*\Psi_T d\tau =  \int_{-\infty}^{\infty}\frac{\partial \Psi_T^*}{\partial \alpha}\Psi_T + \Psi_T^*\frac{\partial \Psi_T}{\partial \alpha} d\tau $$ 
+and because $\Psi_T$ is a real function we have
+
+$$ \frac{\partial}{\partial \alpha}\left<\Psi_T|\Psi_T\right> = 2 \int_{-\infty}^{\infty}\Psi_T^*\frac{\partial \Psi_T}{\partial \alpha} d\tau = 2 \left<\Psi_T|\frac{\partial \Psi_T}{\partial \alpha}\right> $$ 
+
+A very similar thing can be done for the term $\frac{\partial}{\partial \alpha}\left<\Psi_T | \hat{H}|\Psi_T\right>$ and we then end up with
+
+$$ \frac{\partial \left< E_L \right>}{\partial \alpha} = 2\frac{\left<\Psi_T | \hat{H}|\frac{\partial\Psi_T}{\partial \alpha}\right>}{\left<\Psi_T|\Psi_T\right>}- 2\left< E_L \right>\frac{\left<\Psi_T|\frac{\partial\Psi_T}{\partial \alpha}\right>}{\left<\Psi_T|\Psi_T\right>}$$
+
+Which can be written as
+
+$$ \frac{\partial \left< E_L \right>}{\partial \alpha} = 2\left< E_L \frac{\frac{\partial \Psi_T}{\partial \alpha}}{\Psi_T}\right>- 2\left< E_L \right>\left<\frac{\frac{\partial \Psi_T}{\partial \alpha}}{\Psi_T}\right>. $$  
+
+Hence we need to find the normalized derivative of $\Psi_T$ with regards to $\alpha$ and find the expectation value of that, $\left<\frac{\frac{\partial \Psi_T}{\partial \alpha}}{\Psi_T}\right>$. With our trial wavefunction we have that
+
+$$\frac{\frac{\partial \Psi_T}{\partial \alpha}}{\Psi_T} = -\sum_{i=0}^N r_i^2$$ where $r_i^2 = x_i^2 + y_i^2 + \beta z_i^2$ and $N$ is the number of particles.
+
+\section{Equilibration}\label{app:equlibration}
+
+I chose to use the system with three particles in three dimensions to evaluate how many steps I needed to reach equilibrium. Figure \ref{fig:equilibrium} shows how the expectation value of the energy changes with the amount of MC cycles. We observe that $10^5$ MC cycles are enough to reach an equilibrium or at least some sort of steady state where the energy does not change substantially. 
+
+In this project I chose to use a set number of steps to reach equilibrium instead of an equilibration fraction. That means that all calculations run for $10^5$ steps before the sampling start and these steps are not included in the steps mentioned in plots and text.
+
+\begin{figure}[H]
+\center
+\includegraphics[width=0.7\linewidth]{../Results/equilibrium}\caption{The relationship between the number of MC cycles and the expectation value. The dotted line represents the choice of equilibration.}\label{fig:equilibrium}
+\end{figure} 

@@ -29,24 +29,13 @@ bool System::metropolisStep() {
     double   oldWaveFunction      = m_waveFunction->evaluate();
     int      randomParticleIndex  = Random::nextInt(m_numberOfParticles);
 
-    // if (m_steps == 4533+(int)1e5 || m_steps == 4532+(int)1e5){
-    //     std::cout << "particle: " << randomParticleIndex+1 << std::endl;
-    //     std::cout << "oldWavefunction: " << oldWaveFunction << std::endl;
-    // }
 
     for(int m1=0;m1<m_numberOfDimensions; m1++){
         randomAmount[m1] = m_stepLength*(Random::nextDouble()-0.5);
         m_particles[randomParticleIndex]->adjustPosition(randomAmount[m1], m1);
-        // if (m_steps == 4533+(int)1e5 || m_steps == 4532+(int)1e5){
-        // std::cout << "Particle pos change: " << randomAmount[m1] << std::endl;
-        // }
     }
 
     double newWaveFunction = m_waveFunction->evaluate();
-    
-    // if (m_steps == 4533+(int)1e5 || m_steps == 4532+(int)1e5){
-    //     std::cout << "newWavefunction: " << newWaveFunction << std::endl;
-    // }
 
     
     if (Random::nextDouble() <= newWaveFunction*newWaveFunction
@@ -94,7 +83,7 @@ bool System::metropolisStepImportance() {
 
     double greensFunctionFrac = greensFunctionFraction(oldPosition, oldQuantumForce,
                                                          newPosition, newQuantumForce);
-
+    // Determening if step is accepted (return true) or not (move particle back and return false)
     if (Random::nextDouble() <= greensFunctionFrac*newWaveFunction*newWaveFunction
                                             /(oldWaveFunction*oldWaveFunction)){
         return true;
@@ -104,7 +93,7 @@ bool System::metropolisStepImportance() {
     for(int m4=0;m4<m_numberOfDimensions; m4++){
         m_particles[particleIndex]->adjustPosition(-importanceAmount[m4], m4);
     }
-    // std::cout << "step not accepted" << std::endl;
+
     return false;
 }
 

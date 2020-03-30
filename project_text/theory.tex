@@ -4,12 +4,12 @@ In this project we want to evaluate the ground state energy of the Bose-Einstein
 \end{equation}
 to find the expectation value for the energy. Here $\Psi$ is a function of the position of every particle, $\mathbf{r}_1, \mathbf{r}_2, \mathbf{r}_3, ... , \mathbf{r}_N$. 
 
-The hamiltonian of the model is given by
+The Hamiltonian of the model is given by
  \begin{equation}
      H = \sum_i^N \left(\frac{-\hbar^2}{2m}{\bigtriangledown }_{i}^2 +V_{ext}({\mathbf{r}}_i)\right)  +
 	 \sum_{i<j}^{N} V_{int}({\mathbf{r}}_i,{\mathbf{r}}_j),
  \end{equation}
-which includes the kinetic energy, the external potential, $V_{ext}$, and the potential from interactions, $V_{int}$. We have assumed that the interactions are dominated and defined by only two-body interactions, i.e. two-body collisions.
+which includes the kinetic energy, the external potential, $V_{ext}$, and the potential from interactions between particles, $V_{int}$. We have assumed that the interactions are dominated and hence modelled by only two-body interactions, i.e. two-body collisions.
 
 In this project we have chosen to model the many-particle wavefunctions as a product of free single-particle wavefunctions times a function $f$ which represent their interaction,
 
@@ -29,7 +29,7 @@ where $N$ is the number of particles and
     g(\mathbf{r}_k, \alpha)= \exp{[-\alpha(x_k^2+y_k^2+\beta z_k^2)]}.
  \end{equation}
 
-The Bose-Einstein gas is created by confining the bosons in a magetic trap. We model this trap as a harmonic oscillator potential 
+The Bose-Einstein gas is created by confining the bosons in a magnetic trap. We model this trap as a harmonic oscillator potential 
 \begin{equation}
  V_{ext}(\mathbf{r}) = 
  \Bigg\{
@@ -40,7 +40,7 @@ The Bose-Einstein gas is created by confining the bosons in a magetic trap. We m
  \label{eq:trap_eqn}
  \end{array}
  \end{equation}
-which can be either spherical (S) or elliptical (E). Here $\omega^2_{ho}$ is the trap potential strenght and in the elliptical case $\omega_{ho}$ is the trap frequency in the x- and y- direction while $\omega_z$ is the trap frequency in the z-direction.
+which can be either spherical (S) or elliptical (E). Here $\omega^2_{ho}$ is the trap potential strength and in the elliptical case $\omega_{ho}$ is the trap frequency in the x- and y- direction while $\omega_z$ is the trap frequency in the z-direction.
  
 The two-body collisions are modelled as a pair-wise, repulsive potential 
  \begin{equation}
@@ -60,7 +60,7 @@ where $a$ is the hard-core diameter of the bosons. This interaction potential re
  \end{equation}
  describing the interaction part of the wave functions in Eq. \ref{eq:trialwf}.
  
- To simplify calcualtions we define a new function $u$ to be $u = \ln(f)$, so that Eq. \ref{eq:trialwf} is 
+ To simplify calculations we define a new function $u$ to be $u = \ln(f)$, so that Eq. \ref{eq:trialwf} is 
  
  \begin{equation*}
 \Psi_T(\mathbf{r})=\left[
@@ -73,7 +73,7 @@ where we have defined $r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|$.
 
 \subsection{Variational Monte Carlo}
 
-We are using the Variational Monte Carlo Method (VMC) to find the gound state energy of the system discribed above. We need to evaluate the expectation value of the energy for a trial wavefunction with the parameter, $\alpha$, and then vary $\alpha$ to find the parameter that gives us the ground state energy, $E_0$. We know that for all wave functions that are not the exact ground state wavefunction, $\Psi_0$, the expectation energy will be larger than $E_0$. Hence we vary $\alpha$ until we find the minimum energy.
+We are using the Variational Monte Carlo (VMC) method to find the ground state energy of the system described above. We need to evaluate the expectation value of the energy for a trial wavefunction with the parameter, $\alpha$, and then vary $\alpha$ to find the parameter that gives us the ground state energy, $E_0$. We know that for all wavefunctions that are not the exact ground state wavefunction, $\Psi_0$, the expectation energy will be larger than $E_0$. Hence we vary $\alpha$ until we find the minimum energy.
 
 We then have to solve Eq. \ref{eq:SE} with regards to the energy, $E$, 
 
@@ -90,18 +90,18 @@ where $ d\tau = d\mathbf{r}_1d\mathbf{r}_2 ... d\mathbf{r}_N$. To use the VMC me
 by introducing 
 $$P(\tau) = \frac{\Psi^*(\tau) \Psi(\tau)}{\int \Psi^*(\mathbf{\tau}')\Psi(\mathbf{\tau}') d \tau' } = \frac{|\Psi^*(\tau)|^2}{\int |\Psi(\mathbf{\tau}')|^2 \,d \tau' }$$
 
-which is the probability distribution of the energies. This is useful because, if we assume $P$ to be a normal distribution, we can solve the integral by calculating the local energy, $E_L$, at random positions for every particle $N$ and calculculate the average of these local energies. The expectation value is then 
+which is the probability distribution of the energies. This is useful because, if we assume $P$ to be a normal distribution, we can solve the integral by calculating the local energy, $E_L$, for the situation were the particels are randomly  distributed, repeat this many times and then calculate the average of these local energies. The expectation value is then 
 $$ \left< E(\alpha) \right> \approx \frac{1}{M} \sum_{k=1}^M E_L(\tau_k, \alpha) $$
 where $M$ is the number of Monte Carlo cycles. This is a use of the VMC method.
 
 \subsection{Sampling}
-In this project sampling is about how to extract the local energy of the system, with the particles in random positions, in an efficient way. We start with a system of particles in random positions and we want to change one particle's postions, make a move, and then calculate the energy in the new situation. In particular, sampling is how we decide if a move is accepted of not. If it is accepted, the local energy (and other parameters) is sampled, if it is not accepted, the local energy in the old position is sampled. We have looked at two different methods to decide is a move is accepted or not, the Metropolis algorithm, the brute force method, and the Metropolis-Hastings method, importance sampling. 
+In this project sampling is about how to extract the local energy of the system, with the particles in random positions, in an efficient way. We start with a system of particles in random positions and we want to change one particle's positions, make a move, and then calculate the energy in the new situation. In particular, sampling is how we decide if a move is accepted of not. If it is accepted, the local energy (and other parameters) is sampled, if it is not accepted, the local energy in the old position is sampled. We have looked at two different methods to decide is a move is accepted or not, the Metropolis algorithm, the brute force method, and the Metropolis-Hastings method, importance sampling. 
 
-Both methods start by looking at a Markow chain
+Both methods start by looking at a Markow chain,
 
-$$ P_i(t+\epsilon) = \sum_j W(j\rightarrow i) P_j(t) $$
+$$ P_i(t+\epsilon) = \sum_j W(j\rightarrow i) P_j(t), $$
 
-which is an expression for the probability of being in a state $i$ after a time $\epsilon$. The probability if found by adding the probability of transitionaing from a state $j$ which is given by the probability of being in a state $j$ times the probability of making the transition from $i$ to $j$, $W(i\rightarrow j)$. $W(i\rightarrow j)$ is modelled by seperating it into the acceptance of a proposed move times the likelyhood of making the transition from $i$ to $j$, $W(i\rightarrow j) = A(i\rightarrow j)T(i\rightarrow j)$.
+which is an expression for the probability of being in a state $i$ after a time $\epsilon$. The probability if found by adding the probability of transitioning from a state $j$ which is given by the probability of being in a state $j$ at the the $t$, $P_j(t)$, times the probability of making the transition from $i$ to $j$, $W(i\rightarrow j)$. $W(i\rightarrow j)$ is modelled by separating it into the acceptance of a proposed move times the likelihood of making the transition from $i$ to $j$, $W(i\rightarrow j) = A(i\rightarrow j)T(i\rightarrow j)$.
 
 \subsubsection{Brute force}
 
@@ -109,23 +109,25 @@ In the brute force sampling method we assume that $ T(i\rightarrow j) = T(j\righ
 
 $$ \frac{P_j}{P_i} = \frac{W(i\rightarrow j)}{W(j\rightarrow i)} = \frac{A(i\rightarrow j)}{A(j\rightarrow i)} > 1$$
 
-The brute force way of sampling works like this:\\
-- Pick random particle \\
-- Move by random amount (in one, two or three dimensions) times a step length, $dl$, to new position. The state where one of the particels is moved is the new state $j$\\
-- Check if the move is accepted. It is accepted if a random number between 0 and 1 is bigger than $\nicefrac{P_j}{P_i}$, i.e. if $P_j>P_i$ it is always accepted  because it will then move to a more likely state. If $P_i>P_j$ it will sometimes make the move depending on the random number.
+The brute force way of sampling works like this:
+\begin{itemize}
+\item[-] Pick random particle
+\item[-] Move particle by random amount (in one, two or three dimensions) times a step length, $dl$, to a new position. The state where one of the particles is moved is the new state $j$.
+\item[-] Check if the move is accepted. It is accepted if a random number between 0 and 1 is bigger than $\nicefrac{P_j}{P_i}$, i.e. if $P_j>P_i$ it is always accepted  because it will then move to a more likely state. If $P_i>P_j$ it will sometimes make the move depending on the random number.
+\end{itemize}
 
-Depending of the step length, $dl$, the number of accepted moved will vary, but it is in general not a very effective method. We might waste many Monte Carlo (MC) cylces on moves that are not accepted.
+Depending on the step length, $dl$, the number of accepted moves will vary, but it is in general not a very effective method. We might waste many Monte Carlo (MC) cycles on moves that are not accepted.
 
 \subsubsection{Importance sampling}
 
 Importance sampling is a smarter way of sampling where we get more accepted moves. In this case we have $ T(i\rightarrow j) \neq T(j\rightarrow i)$ which leads to
 
-$$  A(i\rightarrow j) = min\left( 1, \frac{P_i T(i\rightarrow j)}{P_i T(j\rightarrow i)}  \right)$$ and we need a model for  $T(j\rightarrow i)$.
+$$  A(i\rightarrow j) = min\left( 1, \frac{P_i T(i\rightarrow j)}{P_j T(j\rightarrow i)}  \right)$$ and we need a model for  $T(j\rightarrow i)$.
 
-To model $T (i \rightarrow j) = T(t, \mathbf{x} )$ (we imagine that the MC cylces is time elapsing) we use the Fokken-Planck equation 
-
-$$ \frac{\partial T}{\partial t} = D \frac{\partial^2 T}{\partial x^2} - D \frac{\partial F}{\partial x} T $$
-
+To model $T (i \rightarrow j) = T(t, \mathbf{x} )$ (we imagine that the going through the MC cycles is time elapsing) we use the Fokken-Planck equation, 
+\begin{equation}\label{eq:fokken_planck}
+\frac{\partial T}{\partial t} = D \frac{\partial^2 T}{\partial x^2} - D \frac{\partial F}{\partial x} T,
+\end{equation}
 which is the same as the heat equation and Fick's second law with the inclusion of a drift force, $F$, for one dimension.  We are interested in moving towards a stationary state where $T (t, \mathbf{x})$ is not changing i.e. the maximum of the probability distribution. We therefore evaluate 
 $$  \frac{\partial T}{\partial t} = 0 \implies 0 = \sum_i D \frac{\partial}{\partial x_i} \mathbf{e}_i \left( \frac{\partial}{\partial x_i} \mathbf{e}_i - \mathbf{F}_i\right) T $$
 for several dimensions. From this we find the drift force to be 
@@ -134,26 +136,28 @@ for several dimensions. From this we find the drift force to be
 \mathbf{F} = 2 \frac{1}{\Psi_T} \nabla\Psi_T
 \end{equation}
 
-With importance sampling we use the drift force to move the particles to a position, i.e. a state, which has a higher probability, $P = |\Psi|^2$, and we also use it to change the way we accept the moves. 
+With importance sampling, we use the drift force to move the particles to a position, i.e. a state, which has a higher probability, $P = |\Psi|^2$, and we also use it to change the way we accept the moves. 
 
-The importance sampling works like this:\\
-- Pick random particle\\
-- Move the particle according to the drift force, $\mathbf{F}$, to a position which is more has higher probability using the expression
+The importance sampling works like this:
+\begin{itemize}
+\item[-] Pick random particle.
+\item[-] Move the particle according to the drift force, $\mathbf{F}$, to a position which is has higher probability using the expression
 $$ \mathbf{r}'_k = \mathbf{r}_k + D\Delta t \mathbf{F}(\mathbf{r}_1,...,\mathbf{r}_k,..., \mathbf{r}_N) + \xi \sqrt{\Delta t} $$
-where $F(r_k) = \frac{2}{\Psi}\nabla_k\Psi$, $\xi$ is a random number from a gaussian distribution, $D$ is a constant and $\Delta t$ is a variable called the time step.\\
-- Check if the move is accepted using
+where $F(r_k) = \frac{2}{\Psi}\nabla_k\Psi$, $\xi$ is a random number from a Gaussian distribution, $D$ is a constant and $\Delta t$ is a variable called the time step.
+\item[-] Check if the move is accepted using
 $$ A(r_1\rightarrow r_2) = min\left( 1, \frac{g(r_1\rightarrow r_2)}{g(r_2\rightarrow r_1)}\frac{P_{r_2}}{P_{r_1}}\right)$$
 where $g$ is Green's function
-$$ g(\mathbf{r}_k \rightarrow \mathbf{r}'_k) = \frac{1}{4 D \Delta t^N}\exp\left( \frac{-(\mathbf{r}'_k - \mathbf{r}_i - D\Delta tF(\mathbf{r}_k))}{4 D \Delta t}\right)$$ which also includes the drift force.\\
+$$ g(\mathbf{r}_k \rightarrow \mathbf{r}'_k) = \frac{1}{4 D \Delta t^N}\exp\left( \frac{-(\mathbf{r}'_k - \mathbf{r}_i - D\Delta tF(\mathbf{r}_k))}{4 D \Delta t}\right)$$ which is a solution to Eq. \ref{eq:fokken_planck} and hence also includes the drift force.
+\end{itemize}
 
-With importance sampling more moves are accepted hence it is more effective in MC cycles, but it is less effective for each cycle because we have to calculate the drift force including the derivative of $\Psi$ and the Green's function ratio for every MC cycle.
+With importance sampling more moves are accepted hence it is more effective in MC cycles However, it is less effective for each cycle because we have to calculate the drift force including the derivative of $\Psi$ and the Green's function ratio for every MC cycle.
 
 \subsection{Optimization and gradient methods}
-Optimization is how to find the optimal parameters. In our case it as how to find the $\alpha$ which gives the minimum energy, the ground state energy, $E_0$. We want to find the parameter in a more efficient way than just calcualting the expectation energy for a range of $\alpha$s and afterwards evaluate which $\alpha$ that gave the lowest energy.
+Optimization is how to find the optimal parameters. In our case it as how to find the $\alpha$ which gives the minimum energy, the ground state energy, $E_0$. We want to find the parameter in a more efficient way than just calculating the expectation energy for a range of $\alpha$s and afterwards evaluate which $\alpha$ that gave the lowest energy.
 
 We want to find the energy minimum, which naturally occur if the derivative of the expectation value with regards to $\alpha$ is zero and the double derivative is positive.
 \subsubsection{Newton-Raphson's root-finding algorithm}
-Newton-Raphson's root-finding algorithm is an iterative method of finding the root of an equation. We want to find the ground state wave function i.e. the $\alpha$ that gives the minimum energy. Then we have to find the root of the derivative of the local energy, i.e. the $\alpha$ where the derivative of the expecation value of the local energy is zero.
+Newton-Raphson's root-finding algorithm is an iterative method of finding the root of an equation. We want to find the ground state wavefunction i.e. the $\alpha$ that gives the minimum energy. Then we have to find the root of the derivative of the local energy, i.e. the $\alpha$ where the derivative of the expectation value of the local energy is zero.
 $$ 0 = \frac{\partial \left<E_L(\alpha)\right>}{\partial \alpha}$$
 We start with a guess for the root $\alpha_k$, and extract a new guess from the tangent line of the derivative of the energy with respect to $\alpha$. The tangent line, $y$, at $\alpha_k$ is:
 $$y = \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} + (\alpha_{k+1} - \alpha_k) \frac{\partial^2 \left<E_L(\alpha_k)\right>}{\partial \alpha^2}$$
@@ -161,34 +165,32 @@ $$y = \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} + (\alpha_{k+1
 The new approximation of the root, $\alpha_{k+1}$, is found from where the tangent line is zero, $y(\alpha_{k+1})=0$
 $$ \alpha_{k+1} =  \alpha_k - \left(\frac{\partial^2 \left<E_L(\alpha_k)\right>}{\partial \alpha^2}\right)^{-1}\frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} $$
 
-We need to calculate the double derivative of the expectation value of the local energy, but this expression is difficult to and might involve many integrals which are expensicve to calculate numerically. Therefore we used methods that approximate the double derivative. 
+We need to calculate the double derivative of the expectation value of the local energy. Hoever, this expression is difficult to calculate analytically and might involve many integrals which are expensive to calculate numerically. Therefore we use methods that approximate the double derivative. 
 
 \subsubsection{Simple gradient descent}\label{sec:gradient}
 The simplest gradient descent method use Newton-Raphson's root-finding algorithm, but approximate the inverse of the double derivative with a constant, $\gamma$. Then we have the expression
 $$ \alpha_{k+1} =  \alpha_k - \gamma \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha}. $$
-With this method the value for $\gamma$ is found from trial and error.
+With this method, the value for the minimization rate, $\gamma$, is found from trial and error.
 
 \subsubsection{Utilizing previous gradients}\label{sec:gradient2}
 
-Another simple method which also include the previously calculated gradient gives this expression for the next approximation for $\alpha$.
-$$  \alpha_{k+1} =  \alpha_k - \tilde{\gamma} (1-\lambda) \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} - \lambda \frac{\partial \left<E_L(\alpha_{k-1})\right>}{\partial \alpha}  $$
-Here we can choose how much weight we want to give the previous gradient by adjusting this new constant $\lambda$. An optimal value of $\tilde{\gamma}$ has to be found just as $\gamma$ had to be in the simpler version.
+Another simple method, which also include the previously calculated gradient, gives this expression for the next approximation for $\alpha$:
+$$  \alpha_{k+1} =  \alpha_k - \tilde{\gamma} (1-\lambda) \frac{\partial \left<E_L(\alpha_k)\right>}{\partial \alpha} - \lambda \frac{\partial \left<E_L(\alpha_{k-1})\right>}{\partial \alpha}.  $$
+Here we can choose how much weight we want to give the previous gradient by adjusting this new constant $\lambda$. An optimal value of both the weigth $\lambda$ and the minimization rate $\tilde{\gamma}$ has to be found just as $\gamma$ had to be in the simpler version.
 
-\textit{Add something about how to find the gradient!}
-
-\subsection{Statistical analysis and resampling}
+\subsection{Statistical analysis}
 
 An important part of this project is statistical analysis. We have to know as much as we can about the errors of our calculated results. Since we are using a VMC method, this involves statistical analysis.
 
 \subsubsection{Evaluation of statistical errors}
 
-There several errors involved in this project. We can group them into systematical error and statistical errors. The systematic errors includes the errors from the acutally model we use to model reality. In our project with VMC this could be related to the step length, $dl$, in brute force sampling or the time step, $\Delta t$, in importance sampling. These errors are hard to investigate.
+There several errors involved in this project. We can group them into systematic errors and statistical errors. The systematic errors includes the errors from the actual model we use to model reality. In our project with VMC this could be related to the step length, $dl$, in brute force sampling or the time step, $\Delta t$, in importance sampling. These errors are hard to investigate.
 
 The other type of errors, the statistical ones, can be evaluated from common tools in statistics which is what we focused on in this project.
 
 \subsubsection{Statistical parameters}
 
-\begin{table}[H]\caption{A oversikt over the different statistical terms where $M$ is the number of Monte Carlo cycles, $p$ is the probability distribution and $\bar{E_L}$ is the simple mean. *assume that $p(E_L)$ is a normal distribution and diskretized. For the covariance $m$ is the number of data points in the data set $X$ and $n$ is the number of data points in the data set $Y$.}\label{tab:statistical_terms}
+\begin{table}[H]\caption{A overview over the different statistical terms where $M$ is the number of Monte Carlo cycles, $p$ is the probability distribution and $\bar{E_L}$ is the simple mean. *assume that $p(E_L)$ is a normal distribution and discretized. For the covariance $m$ is the number of data points in the data set $X$ and $n$ is the number of data points in the data set $Y$.}\label{tab:statistical_terms}
 \begin{tabular}{|l|l|}\hline
 Expectation value & $\left< E_L\right> = \int E_L p(E_L) dE_L$\\
 Expectation value* & $  \left< E_L\right> = \bar{E_L}= \frac{1}{M}\sum_{i=1}^M E_L $\\
@@ -200,19 +202,19 @@ Covariance* & $ cov(X, Y) = \frac{1}{mn}\sum_{i=1}^m\sum_{j=1}^n \frac{1}{2}\lef
 \end{tabular}
 \end{table}
 
-Table \ref{tab:statistical_terms} shows the expression for the statistical terms in this project. All terms exept the covariance is pretty much self-explanitory by their names. The covariance is a term that inculdes the measure of correlation in the dataset. If there is no correlation in the data set, the covariance is zero, just as the variance would be zero if you had found the exact energy. 
+Table \ref{tab:statistical_terms} shows the expressions for the statistical terms in this project. All terms except the covariance is pretty much self-explanatory by their names. The covariance is a term that includes the measure of correlation in the dataset. If there is no correlation in the data set, the covariance is zero, just as the variance would be zero if you had found the exact energy every time you sample.
 
-To calculate the covariance directly, we need to evaualte the double sum in the last expression in Tab. \ref{tab:statistical_terms}, but because VMC gives many data points this is a very expensive task. Therefore, we want to use a method to approximate the covariance. 
+To calculate the covariance directly, we need to evaluate the double sum in the last expression in Tab. \ref{tab:statistical_terms}, but because VMC gives many data points this is a very expensive task. Therefore, we want to use a method to approximate the covariance. 
 
-\subsection{Resampling methods}
+\subsection{Resampling techniques}
 
-Methods used to approximate the covariance are called resampling techiques. What you to is to take the data set you have from the numerical experiments and resample them, to extract the correlation in the data set. 
+Methods used to approximate the covariance are called resampling techniques. What you do is take the data set you have from the numerical experiments and resample them, to extract the correlation in the data set. 
 
-In this project the correlation in the data set comes from our random number generator, because it is not truly random and the next random number is relatied to the previos one. The correlation leads to a larger error in the results than the normal variance shows. That is why it is important to approximate the covariance, so that a better estimate of the error is presented.
+In this project the correlation in the data set comes from our random number generator, because it is not truly random and the next random number is related to the previous one. The correlation leads to a larger error in the results than the normal variance shows. That is why it is important to approximate the covariance, so that a better estimate of the error is presented.
 
 \subsubsection{Blocking}
 
-Because VMC gives many data points we have used the blocking method as a resampling method, since it works best for large data sets. In the blocking method, you seperate the data set into blocks and calculate the variance of the seperate data sets. Afterwards, you calculate the variance of the different variances. Then you seperate the previous blocks into smaller blocks and do the same thing with these new and smaller blocks. Eventually the change in the variances of the variances will decrease and this value is the approcimation of the variance which inculdes the error from correlation in the data set.
+Because VMC gives many data points we have used the blocking method as a resampling method, since it works best for large data sets. In the blocking method, you separate the data set into blocks and calculate the variance of the separate data sets. Afterwards, you calculate the variance of the different variances. Then you separate the previous blocks into smaller blocks and do the same thing with these new and smaller blocks. Eventually the change in the variances of the variances will decrease and this value is the approximation of the variance which includes the error from correlation in the data set.
 
 %\begin{equation}
 %f_d = \frac{1}{Mn}\sum_{\alpha=1}^M\sum_{j=1}^n \left( x_{\alpha, j} - \left< x_M\right> \right) \left( x_{\alpha, j+d} - \left< x_M\right> \right)
